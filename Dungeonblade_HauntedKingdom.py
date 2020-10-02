@@ -29,6 +29,49 @@ gameversion = "v1.0"
 # the game codename
 gamecodename = "StarDancer"
 
+"""
+set our game state.
+
+-4: start the game
+-3: difficulty select
+-2: name change
+-1: story
+0: exploring
+1: enemy encounter
+2: combat
+"""
+
+gamestate = -4
+
+# blank objects.
+item_nullweapon = {
+    'name': "null",
+    'desc': '',
+    'healthtouse': 0,
+    'staminatouse': 0,
+    "rarity": 0,
+    'isgold': False,
+    'istrap': False}
+npc_null =  {
+    'name': '',
+    'weapon': item_nullweapon,
+    "health": 0,
+    "maxhealth": 0,
+    "rarity": 0}
+room_null = {
+    'name': 'null',
+    'desc': "",
+    'rarity': 0}
+
+#current enemy
+currEnemy = npc_null
+# are we attacking?
+attacking = False
+# are we dodging?
+dodging = False
+# are we blocking?
+blocking = False
+
 ## player values
 
 # the player name
@@ -104,10 +147,8 @@ maxStepsCounter = maxStepsToLair
 # rarity variables
 enemyMinRarity = 1
 enemyMaxRarity = 5
-
 itemMinRarity = 1
 itemMaxRarity = 5
-
 locationMinRarity = 1
 locationMaxRarity = 5
 
@@ -127,13 +168,13 @@ minduel = 1
 maxduel = 10
 # greater probability for the player to atttack enemies after dodging.
 minattack_afterdodge = 3
-maxattack_afterdodge = 20
+maxattack_afterdodge = 15
 # lower probability for the player to atttack tougher enemies after dodging.
 minattack_afterdodge_toughenemy = 3
 maxattack_afterdodge_toughenemy = 10
 # higher probability for the player to atttack tougher enemies after blocking.
 minattack_afterblock_toughenemy = 3
-maxattack_afterblock_toughenemy = 20
+maxattack_afterblock_toughenemy = 15
 # probability for the enemy to attack the player before they start running.
 minEnemyAttacksPlayer = 1
 maxEnemyAttacksPlayer = 5
@@ -169,6 +210,9 @@ additionalStaminaToRegenAfterCombat = 35
 # the amount of health to give back at low health.
 healthToRegenAfterCombat = 50
 
+# used for bonus stamina.
+bonusstamina = additionalStaminaToRegenAfterCombat + staminaToRegenAfterCombat
+
 ##commands
 
 # command lists
@@ -197,8 +241,294 @@ command_difficulty_easy = difficultySelectCommands[0:2]
 command_difficulty_normal = difficultySelectCommands[2:4]
 command_difficulty_hard = difficultySelectCommands[4:6]
 
-## difficulty setting
+## TEXT
+wintextbase = ""
+wintext = wintextbase
+wintext_boss = wintextbase
+breathtext = ""
+breathtextalt = ""
+refillhealthtext = ""
+baserevivetext = ""
+combatrevivetext = baserevivetext
+revivetext = baserevivetext
+basedeadtext = ""
+deadtext = basedeadtext
+deadtextdungeon = basedeadtext
+easytext = ""
+normaltext = ""
+hardtext = ""
+starttext = ""
+proceedtext = ""
+gohometext = ""
+breathtextrunning = ""
 
+
+# update the text.
+def updateText():
+    global wintextbase, wintext, wintext_boss
+    global breathtext, breathtextalt, breathtextrunning
+    global refillhealthtext
+    global baserevivetext, combatrevivetext, revivetext
+    global basedeadtext, deadtext, deadtextdungeon
+    global easytext, normaltext, hardtext
+    global starttext, proceedtext, gohometext
+    global currEnemy
+    global staminaToRegenAfterCombat, bonusstamina, maxPlayerStamina, staminaToAddAfterRunning
+    global healthToRegenAfterCombat, maxPlayerHealth
+    global playerName
+    global goldCoinsNeeded
+    global command_difficulty_easy, command_difficulty_normal, command_difficulty_hard
+    global enemyattacktext
+    
+    wintextbase = "The " + currEnemy['name'] + " has been slayed!"
+    
+    wintext = """
+""" + wintextbase + " "
+
+    wintext_boss = "" + wintextbase + """
+
+You have saved the kingdom from a threat like no other.
+The hordes of supernatural invaders suddenly vanish throughout the dungeon and the kingdom.
+
+Although, as a result of your success, you feel the quakes of the now unstable dungeon.
+Your gold coins make a chatter in your pocket, and suddenly, a portal opens behind you.
+
+You go through the portal and end up where you started. You hop onto your horse and race back to the kingdom.
+You see the dungeon fall apart. The spirits inhabiting the abandoned rooms can finally rest.
+
+When you arrive to the kingdom, the King welcomes you with open arms as a large crowd cheers upon your arrival.
+
+A day later, the King officially announces your success to the kingdom to an equally loud roar from an even larger crowd.
+The King declares you as the next person in line to become King.
+
+After the celebration, the King asks you to come with him to his quarters.
+He pulls out a legendary sword known as the DUNGEONBLADE. Only the King's trusted men can use this sword, and you are its next owner.
+
+The King gives you the sword. When examining the blade, you notice """ + str(maxGoldCoinsToWin) + """ coin-sized holes embedded in the blade.
+You insert the coins into the blade, and they fill the empty space to become one with the metal.
+
+A blue fire surrounds the sword blade as you hold it firmly in your grasp. No supernatural being ever will attack the kingdom again.
+
+Meanwhile, a pair of small, glowing red eyes peer out from the ruins of the dungeon. Red eyes that peer out for revenge...
+
+T H E  E N D ."""
+
+    breathtext = """
+You take a deep breath after the battle.
+After calming down, you continue your journey.
+
++""" + str(staminaToRegenAfterCombat) + """ Stamina
+"""
+
+    breathtextalt = """
+You take a deep breath after the battle for an extended amount of time.
+After calming down, you continue your journey.
+
++""" + str(bonusstamina) + """ Stamina
+"""
+
+    refillhealthtext = """Suddenly, you see a faerie floating around.
+The faerie notices that you are hurt, and as such it heals most of your wounds.
+
++""" + str(healthToRegenAfterCombat) + """ Health
+"""
+
+    baserevivetext = """As your vision starts to blur, you notice the image of a faerie.
+Miraculously, the faerie fully revitalizes you and brings you back to life.
+
++""" + str(maxPlayerHealth) + """ Health
++""" + str(maxPlayerStamina) + """ Stamina"""
+
+    combatrevivetext = """
+After the strike from the """ + currEnemy['name'] + """, you collapse and you slowly begin to see the light.
+
+""" + baserevivetext
+
+    revivetext = """After you have been attacked by one of the dungeon's traps, you collapse and you slowly begin to see the light.
+
+""" + baserevivetext + "\n"
+
+    basedeadtext = """The kingdom is now in grave danger as hordes of paranormal beings overwhelm
+the King's forces. Everyone tries to evacuate, but it is too late.
+
+G A M E  O V E R."""
+
+    deadtext = "You have been defeated by the " + currEnemy['name'] + """.
+
+""" + basedeadtext
+
+    deadtextdungeon = """You have been taken down by one of the dungeon's traps.
+
+""" + basedeadtext
+
+    easytext = "\n" + command_difficulty_easy[0].title() + """:
+You begin with more power than you have ever imagined.
+Enemies tremble in fear by your immense strength and luck.
+Your lungs are made of iron, and will take a very long time to run out of breath.
+Faeries will most likely come to you.
+You are nearly invulnerable.
+"""
+
+    normaltext = "\n" + command_difficulty_normal[0].title() + """:
+You begin with relatively high confidence.
+Enemies are a fair challenge, but will eliminate you if you are not mindful of your strategies.
+You will run out of breath often, but you will fully regain it with time.
+Faeries come to you in times of need, sometimes before death.
+Everything is balanced, as it should be.
+"""
+
+    hardtext = "\n" + command_difficulty_hard[0].title() + """:
+You begin without any hope for survival. You are very weak.
+Enemies will rip you apart, and some lower-ranking enemies are tougher.
+You will be out of breath multiple times during your journey.
+It is rare for a faerie to come to you.
+You will die.
+"""
+
+    starttext = """
+May 5th, 1394:
+
+You are """ + playerName + """, the Royal Guard for the King.
+
+You're rushing down a long, dark path on your horse.
+There's been a dramatic turn of events.
+    
+You recently got a letter from the King, stating that the kingdom is in need of your services.
+It's been under attack by paranormal beings beyond this material world.
+After many weeks, the King was informed of the location of these beings.
+
+A large dungeon was identified as being the main home for all these ghastly beasts roaming the kingdom.
+This specific dungeon is a magical dungeon, which has a life of its own.
+It builds itself around any living inhabitants and summons beasts, items, traps, and locations.
+The dungeon also inhabits faeries that have magical healing properties.
+
+As sworn Royal Guard for the King, you must protect the kingdom from these beasts by slaying them in this living dungeon.
+
+You have also heard of a mythic legend where """ + str(goldCoinsNeeded) + """ golden coins were spread all over the dungeon.
+These coins give the possessor immense boosts of strength. They also will lead you to a 'mystic figure' that rules the dungeon.
+Defeat the figure, and you will be able to escape from the dungeon.
+The legends also hinted at an 'event' that would happen due to that, but they weren't specific.
+
+After that, you took your """ + item_sword['name'].replace("their ", "") + """ and your horse down this dark passage.
+
+You stand before a mighty doorway. You go towards it, but you are unsure if you are ready.
+"""
+
+    proceedtext = """
+You walk towards the large doorway.
+The dungeon seems like a large maze at first.
+You slice your sword into the ground to mark where you are, then you proceed through the hallway.
+"""
+
+    gohometext = """
+You go back on your horse towards the kingdom.
+You tell the king you were too cowardly to attack the beasts.
+The King fires you, and the kingdom continues to be invaded by the paranormal.
+
+G A M E  O V E R ."""
+
+    breathtextrunning = """You stop for a moment to take a deep breath after running from the """ + currEnemy['name'] + """.
+After calming down, you continue your journey.
+
++""" + str(staminaToAddAfterRunning) + """ Stamina
+"""
+
+## COMMANDS
+
+# creates a string list for a command and aliases
+def outputCommandListForCommand(lst, uppercase):
+    cmdList = ""
+
+    first = lst[0]
+    last = lst[-1]
+
+    for entry in lst:
+        if entry != first:
+            if entry != last:
+                cmdList += str(entry) + "/"
+            elif entry == last:
+                cmdList += str(entry)
+        elif entry == first:
+            if uppercase == True:
+                cmdList += str(entry).title() + "/"
+            elif uppercase == False:
+                cmdList += str(entry) + "/"
+
+    return cmdList
+
+# grabs input depending on gamestate.
+def getParserForGameState():
+    global gamestate
+    global command_difficulty_easy, command_difficulty_normal, command_difficulty_hard
+    global command_bootup_yes, command_bootup_no
+    global command_dir_right, command_dir_left, command_dir_forward, command_dir_backward
+    global command_encounter_fight, command_encounter_run
+    global command_combat_attack, command_combat_dodge, command_combat_block
+
+    parser = ""
+    
+    #-3: difficulty select
+    if gamestate == -3:
+        parser = input("Type " +
+                       outputCommandListForCommand(command_difficulty_easy, False) + " for the " + command_difficulty_easy[0].title() + " difficulty,\n" +
+                       outputCommandListForCommand(command_difficulty_normal, False) + " for the " + command_difficulty_normal[0].title() + " difficulty, or\n" +
+                       outputCommandListForCommand(command_difficulty_hard, False) + " for the " + command_difficulty_hard[0].title() + " difficulty: ")
+    #-2: name change
+    elif gamestate == -2:
+        parser = input("Please enter your name to proceed: ")
+    #-1: story
+    elif gamestate == -1:
+        parser = input("Type " + outputCommandListForCommand(command_bootup_yes, False) + " if you are ready to proceed, or " +
+                    outputCommandListForCommand(command_bootup_no, False) + " if you just want to go home: ")
+    #0: exploring
+    elif gamestate == 0:
+        parser = input("Choose where you want to go: " + outputCommandListForCommand(command_dir_left, False) + ", " +
+                      outputCommandListForCommand(command_dir_right, False) + ", " + outputCommandListForCommand(command_dir_forward, False) +
+                      " or " + outputCommandListForCommand(command_dir_backward, False) + ": ")
+    #1: enemy encounter
+    elif gamestate == 1:
+        parser = input("What do you want to do? " + outputCommandListForCommand(command_encounter_fight, True) + " or " + outputCommandListForCommand(command_encounter_run, False) + "?: ")
+    #2: combat
+    elif gamestate == 2:
+        parser = input("What do you want to do? " +
+                   outputCommandListForCommand(command_combat_attack, True) + ", " +
+                   outputCommandListForCommand(command_combat_dodge, False) + " or " +
+                   outputCommandListForCommand(command_combat_block, False) + "?: ")
+
+    return parser
+
+# get the command list array.
+def getCommandsForGameState():
+    global gamestate
+    global combatCommands
+    global encounterCommands
+    global dirCommands
+    global difficultySelectCommands
+    global bootupCommands
+
+    commands = []
+
+    #-3: difficulty select
+    if gamestate == -3:
+        commands = difficultySelectCommands
+    #-1: story
+    elif gamestate == -1:
+        commands = bootupCommands
+    #0: exploring
+    elif gamestate == 0:
+        commands = dirCommands
+    #1: enemy encounter
+    elif gamestate == 1:
+        commands = encounterCommands
+    #2: combat
+    elif gamestate == 2:
+        commands = combatCommands
+
+    return commands
+
+## difficulty stuff
+
+# adjust difficulty setting
 def adjustDifficulty():
     # WHYYYYYY ;_;
     # better now but STILL.
@@ -227,30 +557,7 @@ def adjustDifficulty():
     global lowStaminaDamageReductionMultiplier, emptyStaminaDamageReductionMultiplier
     global runStaminamax
     global minattack_afterblock_toughenemy, maxattack_afterblock_toughenemy
-    
-    easytext = "\n" + command_difficulty_easy[0].title() + """:
-You begin with more power than you have ever imagined.
-Enemies tremble in fear by your immense strength and luck.
-Your lungs are made of iron, and will take a very long time to run out of breath.
-Faeries will most likely come to you.
-You are nearly invulnerable.
-"""
-
-    normaltext = "\n" + command_difficulty_normal[0].title() + """:
-You begin with relatively high confidence.
-Enemies are a fair challenge, but will eliminate you if you are not mindful of your strategies.
-You will run out of breath often, but you will fully regain it with time.
-Faeries come to you in times of need, sometimes before death.
-Everything is balanced, as it should be.
-"""
-
-    hardtext = "\n" + command_difficulty_hard[0].title() + """:
-You begin without any hope for survival. You are very weak.
-Enemies will rip you apart, and some lower-ranking enemies are tougher.
-You will be out of breath multiple times during your journey.
-It is rare for a faerie to come to you.
-You will die.
-"""
+    global easytext, normaltext, hardtext
     
     if difficulty in command_difficulty_easy:
         #easy
@@ -293,13 +600,13 @@ You will die.
         maxblock = 10
         # greater probability for the player to atttack enemies after dodging.
         minattack_afterdodge = 3
-        maxattack_afterdodge = 30
+        maxattack_afterdodge = 20
         # lower probability for the player to atttack tougher enemies after dodging.
-        minattack_afterdodge_toughenemy = 3
-        maxattack_afterdodge_toughenemy = 25
+        minattack_afterdodge_toughenemy = 1
+        maxattack_afterdodge_toughenemy = 10
         # higher probability for the player to atttack tougher enemies after blocking.
         minattack_afterblock_toughenemy = 3
-        maxattack_afterblock_toughenemy = 30
+        maxattack_afterblock_toughenemy = 20
         # probability for the enemy to attack the player before they start running.
         minEnemyAttacksPlayer = 1
         maxEnemyAttacksPlayer = 10
@@ -401,8 +708,41 @@ You will die.
 
         print(hardtext)
 
+    # used for bonus stamina.
+    bonusstamina = additionalStaminaToRegenAfterCombat + staminaToRegenAfterCombat
 
-"""
+#get the main difficulty name.
+def getDifficulty():
+    global difficulty
+    global command_difficulty_easy, command_difficulty_normal, command_difficulty_hard
+
+    # i don't like this...
+    if difficulty in command_difficulty_easy:
+        return command_difficulty_easy[0]
+    elif difficulty in command_difficulty_normal:
+        return command_difficulty_normal[0]
+    elif difficulty in command_difficulty_hard:
+        return command_difficulty_hard[0]
+
+## ITEMS, ENEMIES, AND EVIRONMENT.
+
+# since everything is unintialized, initialize any required items as null.
+itempool = []
+npc_boss = npc_null
+room_finalboss = room_null
+item_sword = item_nullweapon
+item_shield = item_nullweapon
+enemypool = []
+locationpool = []
+
+# update objects.
+def updateObjects():
+    global itempool, enemypool, locationpool
+    global npc_boss, room_finalboss
+    global item_sword, item_shield
+    global maxPlayerHealth, maxPlayerStamina
+
+    """
 Items
 
 aka Pickups, Weapons, and Traps
@@ -415,550 +755,517 @@ a boolean if this item adds to the gold count upon pickup.
 
 note, 'staminatouse' can also be used as the maximum damage an an enemy will deal to a player.
 there's also a description for each enemy weapon to describe the enemy's actions.
-"""
+    """
 
-## weapons
+    ## weapons
 
-# player weapons
+    # player weapons
 
-# Sword
-item_sword = {
-    'name': 'their sword',
-    # used for enemies.
-    'desc': 'The enemy swings their weapon at you!',
-    'healthtouse': 15,
-    #this is used for the max enemy damage only for enemy/player weapons.
-    'staminatouse': 20,
-    "rarity": 0,
-    'isgold': False,
-    'istrap': False}
+    # Sword
+    item_sword = {
+        'name': 'their sword',
+        # used for enemies.
+        'desc': 'The enemy swings their weapon at you!',
+        'healthtouse': 15,
+        #this is used for the max enemy damage only for enemy/player weapons.
+        'staminatouse': 20,
+        "rarity": 0,
+        'isgold': False,
+        'istrap': False}
 
-# Shield
-item_shield = {
-    'name': 'their shield',
-    'desc': 'none',
-    'healthtouse': 0,
-    'staminatouse': 0,
-    "rarity": 0,
-    'isgold': False,
-    'istrap': False}
+    # Shield
+    item_shield = {
+        'name': 'their shield',
+        'desc': 'none',
+        'healthtouse': 0,
+        'staminatouse': 0,
+        "rarity": 0,
+        'isgold': False,
+        'istrap': False}
 
-# enemy weapons
+    # enemy weapons
 
-# bow and arrow. also used in a trap.
-item_arrow = {
-    'name': 'their bow and arrow',
-    'desc': 'The enemy shoots an arrow at you!',
-    'healthtouse': 10,
-    'staminatouse': 15,
-    "rarity": 0,
-    'isgold': False,
-    'istrap': True}
+    # bow and arrow. also used in a trap.
+    item_arrow = {
+        'name': 'their bow and arrow',
+        'desc': 'The enemy shoots an arrow at you!',
+        'healthtouse': 10,
+        'staminatouse': 15,
+        "rarity": 0,
+        'isgold': False,
+        'istrap': True}
 
-# rat claw
-item_claw = {
-    'name': 'their claws',
-    'desc': 'The enemy scratches you!',
-    'healthtouse': 5,
-    'staminatouse': 8,
-    "rarity": 0,
-    'isgold': False,
-    'istrap': True}
+    # rat claw
+    item_claw = {
+        'name': 'their claws',
+        'desc': 'The enemy scratches you!',
+        'healthtouse': 5,
+        'staminatouse': 8,
+        "rarity": 0,
+        'isgold': False,
+        'istrap': True}
 
-# claw for "low ranking" common enemies
-item_lowrankclaw = {
-    'name': item_claw['name'],
-    'desc': item_claw['desc'],
-    'healthtouse': 15,
-    'staminatouse': 20,
-    "rarity": item_claw['rarity'],
-    'isgold': item_claw['isgold'],
-    'istrap': item_claw['istrap']}
+    # claw for "low ranking" common enemies
+    item_lowrankclaw = {
+        'name': item_claw['name'],
+        'desc': item_claw['desc'],
+        'healthtouse': 15,
+        'staminatouse': 20,
+        "rarity": item_claw['rarity'],
+        'isgold': item_claw['isgold'],
+        'istrap': item_claw['istrap']}
 
-# claw for "high ranking" rare enemies
-item_highrankclaw = {
-    'name': item_claw['name'],
-    'desc': item_claw['desc'],
-    'healthtouse': 25,
-    'staminatouse': 30,
-    "rarity": item_claw['rarity'],
-    'isgold': item_claw['isgold'],
-    'istrap': item_claw['istrap']}
+    # claw for "high ranking" rare enemies
+    item_highrankclaw = {
+        'name': item_claw['name'],
+        'desc': item_claw['desc'],
+        'healthtouse': 25,
+        'staminatouse': 30,
+        "rarity": item_claw['rarity'],
+        'isgold': item_claw['isgold'],
+        'istrap': item_claw['istrap']}
 
-# katana for the demigod
-item_katana = {
-    'name': 'their katana',
-    'desc': item_sword['desc'],
-    'healthtouse': 25,
-    'staminatouse': 30,
-    "rarity": item_sword['rarity'],
-    'isgold': item_sword['isgold'],
-    'istrap': item_sword['istrap']}
+    # katana for the demigod
+    item_katana = {
+        'name': 'their katana',
+        'desc': item_sword['desc'],
+        'healthtouse': 25,
+        'staminatouse': 30,
+        "rarity": item_sword['rarity'],
+        'isgold': item_sword['isgold'],
+        'istrap': item_sword['istrap']}
 
-# staff for the boss
-item_bossstaff = {
-    'name': 'their staff',
-    'desc': 'The enemy shoots a large lightning bolt at you!',
-    'healthtouse': 40,
-    'staminatouse': 45,
-    "rarity": 0,
-    'isgold': False,
-    'istrap': True}
+    # staff for the boss
+    item_bossstaff = {
+        'name': 'their staff',
+        'desc': 'The enemy shoots a large lightning bolt at you!',
+        'healthtouse': 35,
+        'staminatouse': 40,
+        "rarity": 0,
+        'isgold': False,
+        'istrap': True}
 
-# staff for the demigod
-item_highrankstaff = {
-    'name': item_bossstaff['name'],
-    'desc': 'The enemy shoots a small lightning bolt at you!',
-    'healthtouse': 25,
-    'staminatouse': 30,
-    "rarity": item_bossstaff['rarity'],
-    'isgold': item_bossstaff['isgold'],
-    'istrap': item_bossstaff['istrap']}
+    # staff for the demigod
+    item_highrankstaff = {
+        'name': item_bossstaff['name'],
+        'desc': 'The enemy shoots a small lightning bolt at you!',
+        'healthtouse': 25,
+        'staminatouse': 30,
+        "rarity": item_bossstaff['rarity'],
+        'isgold': item_bossstaff['isgold'],
+        'istrap': item_bossstaff['istrap']}
 
-# telekinesis
-item_telekinesis = {
-    'name': 'their telekinesis',
-    'desc': 'The enemy flings heavy rocks and debis at you!',
-    'healthtouse': 15,
-    'staminatouse': 20,
-    "rarity": 0,
-    'isgold': False,
-    'istrap': True}
+    # telekinesis
+    item_telekinesis = {
+        'name': 'their telekinesis',
+        'desc': 'The enemy flings heavy rocks and debis at you!',
+        'healthtouse': 15,
+        'staminatouse': 20,
+        "rarity": 0,
+        'isgold': False,
+        'istrap': True}
 
-item_bite = {
-    'name': "their bite",
-    'desc': "The enemy inflicts a bite on you!",
-    'healthtouse': 8,
-    'staminatouse': 10,
-    "rarity": 0,
-    'isgold': False,
-    'istrap': True}
+    item_bite = {
+        'name': "their bite",
+        'desc': "The enemy inflicts a bite on you!",
+        'healthtouse': 8,
+        'staminatouse': 10,
+        "rarity": 0,
+        'isgold': False,
+        'istrap': True}
 
-item_lowrankbite = {
-    'name': item_bite['name'],
-    'desc': item_bite['desc'],
-    'healthtouse': 15,
-    'staminatouse': 20,
-    "rarity": item_bite['rarity'],
-    'isgold': item_bite['isgold'],
-    'istrap': item_bite['istrap']}
+    item_lowrankbite = {
+        'name': item_bite['name'],
+        'desc': item_bite['desc'],
+        'healthtouse': 15,
+        'staminatouse': 20,
+        "rarity": item_bite['rarity'],
+        'isgold': item_bite['isgold'],
+        'istrap': item_bite['istrap']}
 
-item_highrankbite = {
-    'name': item_bite['name'],
-    'desc': "The enemy inflicts a poisonous bite on you!",
-    'healthtouse': 25,
-    'staminatouse': 30,
-    "rarity": item_bite['rarity'],
-    'isgold': item_bite['isgold'],
-    'istrap': item_bite['istrap']}
+    item_highrankbite = {
+        'name': item_bite['name'],
+        'desc': "The enemy inflicts a poisonous bite on you!",
+        'healthtouse': 25,
+        'staminatouse': 30,
+        "rarity": item_bite['rarity'],
+        'isgold': item_bite['isgold'],
+        'istrap': item_bite['istrap']}
 
-## Pickups
+    ## Pickups
 
-# small Medical kit - gives the player 15 HP upon pickup.
-item_smallfirstaid = {
-    'name': 'a small medical kit',
-    # for pickups and traps, the health and stamina usage affects the player.
-    'desc': """You open the medical kit. You kneel down and patch your wounds with the included bandages.
+    # small Medical kit - gives the player 15 HP upon pickup.
+    item_smallfirstaid = {
+        'name': 'a small medical kit',
+        # for pickups and traps, the health and stamina usage affects the player.
+        'desc': """You open the medical kit. You kneel down and patch your wounds with the included bandages.
 Afterwards, you stand up and you keep moving.
 """,
-    'healthtouse': 15,
-    'staminatouse': 0,
-    "rarity": 1,
-    'isgold': False,
+        'healthtouse': 15,
+        'staminatouse': 0,
+        "rarity": 1,
+        'isgold': False,
     'istrap': False}
 
-# Medical kit - gives the player 30 HP upon pickup.
-item_firstaid = {
-    'name': 'a large medical kit',
-    'desc': """You open the medical kit. You kneel down and patch your wounds with the included bandages.
+    # Medical kit - gives the player 30 HP upon pickup.
+    item_firstaid = {
+        'name': 'a large medical kit',
+        'desc': """You open the medical kit. You kneel down and patch your wounds with the included bandages.
 Afterwards, you stand up and you keep moving.
 """,
-    'healthtouse': 30,
-    'staminatouse': 0,
-    "rarity": 1,
-    'isgold': False,
-    'istrap': False}
+        'healthtouse': 30,
+        'staminatouse': 0,
+        "rarity": 1,
+        'isgold': False,
+        'istrap': False}
 
-# Water cup - gives the player 15 stamina points upon pickup.
-item_smallwater = {
-    'name': 'a cup of water',
-    'desc': """You drink the water. You feel refreshed.
+    # Water cup - gives the player 15 stamina points upon pickup.
+    item_smallwater = {
+        'name': 'a cup of water',
+        'desc': """You drink the water. You feel refreshed.
 """,
-    'healthtouse': 0,
-    'staminatouse': 15,
-    "rarity": 1,
-    'isgold': False,
-    'istrap': False}
+        'healthtouse': 0,
+        'staminatouse': 15,
+        "rarity": 1,
+        'isgold': False,
+        'istrap': False}
 
-# Water - gives the player 30 stamina points upon pickup.
-item_water = {
-    'name': 'a bottle of water',
-    'desc': """You drink the water. You feel refreshed.
+    # Water - gives the player 30 stamina points upon pickup.
+    item_water = {
+        'name': 'a bottle of water',
+        'desc': """You drink the water. You feel refreshed.
 """,
-    'healthtouse': 0,
-    'staminatouse': 30,
-    "rarity": 1,
-    'isgold': False,
-    'istrap': False}
+        'healthtouse': 0,
+        'staminatouse': 30,
+        "rarity": 1,
+        'isgold': False,
+        'istrap': False}
 
-# potion - gives the player 50 stamina points and 50 HP upon pickup.
-item_potion = {
-    'name': 'a magical potion',
-    'desc': """You drink the potion. You feel rejuvinated.
+    # potion - gives the player 50 stamina points and 50 HP upon pickup.
+    item_potion = {
+        'name': 'a magical potion',
+        'desc': """You drink the potion. You feel rejuvinated.
 """,
-    'healthtouse': maxPlayerHealth,
-    'staminatouse': maxPlayerStamina,
-    "rarity": 3,
-    'isgold': False,
-    'istrap': False}
+        'healthtouse': maxPlayerHealth,
+        'staminatouse': maxPlayerStamina,
+        "rarity": 3,
+        'isgold': False,
+        'istrap': False}
 
-## Traps
+    ## Traps
 
-# poison - harms the player, but is rare to find.
-item_poison = {
-    'name': 'a magical potion',
-    'desc': """You drink the potion. You instantly feel sick.
+    # poison - harms the player, but is rare to find.
+    item_poison = {
+        'name': 'a magical potion',
+        'desc': """You drink the potion. You instantly feel sick.
 You recover shortly afterwards, but at a price.
 """,
-    'healthtouse': 15,
-    'staminatouse': 3,
-    "rarity": 3,
-    'isgold': False,
-    'istrap': True}
+        'healthtouse': 15,
+        'staminatouse': 3,
+        "rarity": 3,
+        'isgold': False,
+        'istrap': True}
 
-# bear trap - harms the player, but is rare to find.
-item_beartrap = {
-    'name': 'a bear trap (after stepping on it)',
-    'desc': """You have accidentally stepped on a bear trap.
+    # bear trap - harms the player, but is rare to find.
+    item_beartrap = {
+        'name': 'a bear trap (after stepping on it)',
+        'desc': """You have accidentally stepped on a bear trap.
 You scream in pain as you try to remove your foot from the metal jaws.
 You manage to pry it free, but at a price.
 """,
-    'healthtouse': 25,
-    'staminatouse': 5,
-    "rarity": 3,
-    'isgold': False,
-    'istrap': True}
+        'healthtouse': 25,
+        'staminatouse': 5,
+        "rarity": 3,
+        'isgold': False,
+        'istrap': True}
 
-# tripwire - harms the player. but is rare to find.
-item_tripwire = {
-    'name': 'a line of silk (after tripping on it)',
-    'desc': """You trip over a silk string, causing multiple arrows to fire at you.
+    # tripwire - harms the player. but is rare to find.
+    item_tripwire = {
+        'name': 'a line of silk (after tripping on it)',
+        'desc': """You trip over a silk string, causing multiple arrows to fire at you.
 Fortunately, you avoid most of them. However, only one of the arrows pierces your abdomen.
 You manage to remove the arrow, but at a price.
 """,
-    'healthtouse': item_arrow['healthtouse'],
-    'staminatouse': 0,
-    "rarity": 3,
-    'isgold': False,
-    'istrap': True}
+        'healthtouse': item_arrow['healthtouse'],
+        'staminatouse': 0,
+        "rarity": 3,
+        'isgold': False,
+        'istrap': True}
 
-# a pit, not the one from BIONICLE.
-item_pit = {
-    'name': 'a pit (after falling into it)',
-    'desc': """You accidentally fall into a small pit while not looking.
+    # a pit, not the one from BIONICLE.
+    item_pit = {
+        'name': 'a pit (after falling into it)',
+        'desc': """You accidentally fall into a small pit while not looking.
 You manage to escape the pit, but at a price.
 """,
-    'healthtouse': 10,
-    'staminatouse': 0,
-    "rarity": 4,
-    'isgold': False,
-    'istrap': True}
+        'healthtouse': 10,
+        'staminatouse': 0,
+        "rarity": 4,
+        'isgold': False,
+        'istrap': True}
 
-# spikes x5
-item_spikes = {
-    'name': 'a tile of spikes (after stepping on it)',
-    'desc': """You have accidentally stepped on a tile of spikes.
+    # spikes x5
+    item_spikes = {
+        'name': 'a tile of spikes (after stepping on it)',
+        'desc': """You have accidentally stepped on a tile of spikes.
 You scream in pain as you try to remove the small, but sharp pointy pieces of metal from your foot.
 You manage to remove the spikes from your foot, but at a price.
 """,
-    'healthtouse': 20,
-    'staminatouse': 3,
-    "rarity": 4,
-    'isgold': False,
-    'istrap': True}
+        'healthtouse': 20,
+        'staminatouse': 3,
+        "rarity": 4,
+        'isgold': False,
+        'istrap': True}
 
-# tripwire 2 arrows - harms the player. but is rare to find.
-item_tripwireX2 = {
-    'name': 'a line of silk (after tripping on it)',
-    'desc': """You trip over a silk string, causing multiple arrows to fire at you.
+    # tripwire 2 arrows - harms the player. but is rare to find.
+    item_tripwireX2 = {
+        'name': 'a line of silk (after tripping on it)',
+        'desc': """You trip over a silk string, causing multiple arrows to fire at you.
 Fortunately, you avoid most of them. However, two of the arrows pierce your abdomen.
 You manage to remove the arrows, but at a price.
 """,
-    'healthtouse': int(item_tripwire['healthtouse'] * 2),
-    'staminatouse': item_tripwire['staminatouse'],
-    "rarity": 5,
-    'isgold': item_tripwire['isgold'],
-    'istrap': item_tripwire['istrap']}
+        'healthtouse': int(item_tripwire['healthtouse'] * 2),
+        'staminatouse': item_tripwire['staminatouse'],
+        "rarity": 5,
+        'isgold': item_tripwire['isgold'],
+        'istrap': item_tripwire['istrap']}
 
-# spikes and pit
-item_spikesandpit = {
-    'name': 'a pit with serveral tiles of spikes (after falling into the pit and landing on the spikes)',
-    'desc': """You accidentally fall into a small pit while not looking.
+    # spikes and pit
+    item_spikesandpit = {
+        'name': 'a pit with serveral tiles of spikes (after falling into the pit and landing on the spikes)',
+        'desc': """You accidentally fall into a small pit while not looking.
 When you reach the bottom, you land on several tiles of spikes.
 You manage to escape the deadly pit, but at a price.
 """,
-    'healthtouse': int((item_spikes['healthtouse'] * 1.1) + item_pit['healthtouse']),
-    'staminatouse': 6,
-    "rarity": 5,
-    'isgold': False,
-    'istrap': True}
+        'healthtouse': int((item_spikes['healthtouse'] * 1.1) + item_pit['healthtouse']),
+        'staminatouse': 6,
+        "rarity": 5,
+        'isgold': False,
+        'istrap': True}
 
-# Gold Coin
-item_goldcoin = {
-    'name': 'a gold coin',
-    'desc': """You pick up the gold coin. Now to find the rest.
-    """,
-    'healthtouse': 50,
-    'staminatouse': 0,
-    "rarity": 5,
-    'isgold': True,
-    'istrap': False}
+    # Gold Coin
+    item_goldcoin = {
+        'name': 'a gold coin',
+        'desc': """You pick up the gold coin. A glow illuminates from it.
+You put it in your pocket and continue your journey.
+""",
+        'healthtouse': 50,
+        'staminatouse': 0,
+        "rarity": 5,
+        'isgold': True,
+        'istrap': False}
 
-# items must be added in here to be a part of the game. The sword/shield is given to the player by default so we don't include it.
-itempool = [item_smallfirstaid, item_firstaid, item_smallwater, item_water, item_goldcoin, item_potion, item_poison, item_beartrap, item_tripwire, item_pit, item_spikes, item_tripwireX2, item_spikesandpit]
+    # items must be added in here to be a part of the game. The sword/shield is given to the player by default so we don't include it.
+    itempool = [item_smallfirstaid, item_firstaid, item_smallwater, item_water, item_goldcoin, item_potion, item_poison, item_beartrap, item_tripwire, item_pit, item_spikes, item_tripwireX2, item_spikesandpit]
 
-"""
+    """
 Enemies
 
 init enemy stats with a dictionary (https://docs.python.org/3/library/stdtypes.html#dict)
 
 format: enemy name, enemy weapon, minimum health, maximum health, and rarity (an integer from 1 to 5)
-"""
+    """
 
-# skeleton knight
-npc_skeletonknight = {
-    'name': 'skeleton knight',
-    'weapon': item_sword,
-    "health": 50,
-    "maxhealth": 50,
-    "rarity": 1}
+    # skeleton knight
+    npc_skeletonknight = {
+        'name': 'skeleton knight',
+        'weapon': item_sword,
+        "health": 50,
+        "maxhealth": 50,
+        "rarity": 1}
 
-# skeleton archer
-npc_skeletonarcher = {
-    'name': 'skeleton archer',
-    'weapon': item_arrow,
-    "health": 50,
-    "maxhealth": 50,
-    "rarity": 1}
+    # skeleton archer
+    npc_skeletonarcher = {
+        'name': 'skeleton archer',
+        'weapon': item_arrow,
+        "health": 50,
+        "maxhealth": 50,
+        "rarity": 1}
 
-# zombies
-npc_zombie = {
-    'name': 'zombie',
-    'weapon': item_lowrankbite,
-    "health": 75,
-    "maxhealth": 75,
-    "rarity": 1}
+    # zombies
+    npc_zombie = {
+        'name': 'zombie',
+        'weapon': item_lowrankbite,
+        "health": 75,
+        "maxhealth": 75,
+        "rarity": 1}
 
-# ghosts
-npc_ghost = {
-    'name': 'ghost',
-    'weapon': item_telekinesis,
-    "health": 45,
-    "maxhealth": 45,
-    "rarity": 2}
+    # ghosts
+    npc_ghost = {
+        'name': 'ghost',
+        'weapon': item_telekinesis,
+        "health": 45,
+        "maxhealth": 45,
+        "rarity": 2}
 
-# the rat - Rarer than actual enemies for less encounters.
-npc_rat = {
-    'name': 'rat',
-    'weapon': item_claw,
-    "health": 30,
-    "maxhealth": 30,
-    "rarity": 3}
+    # the rat - Rarer than actual enemies for less encounters.
+    npc_rat = {
+        'name': 'rat',
+        'weapon': item_claw,
+        "health": 30,
+        "maxhealth": 30,
+        "rarity": 3}
 
-# the sp-ider
-npc_spider = {
-    'name': 'spider',
-    'weapon': item_bite,
-    "health": 20,
-    "maxhealth": 20,
-    "rarity": 3}
+    # the sp-ider
+    npc_spider = {
+        'name': 'spider',
+        'weapon': item_bite,
+        "health": 20,
+        "maxhealth": 20,
+        "rarity": 3}
 
-# silverfish
-npc_silverfish = {
-    'name': 'silverfish',
-    'weapon': item_bite,
-    "health": 15,
-    "maxhealth": 15,
-    "rarity": 3}
+    # silverfish
+    npc_silverfish = {
+        'name': 'silverfish',
+        'weapon': item_bite,
+        "health": 15,
+        "maxhealth": 15,
+        "rarity": 3}
 
-# goblins
-npc_goblin = {
-    'name': 'goblin',
-    'weapon': item_lowrankclaw,
-    "health": 60,
-    "maxhealth": 60,
-    "rarity": 3}
+    # goblins
+    npc_goblin = {
+        'name': 'goblin',
+        'weapon': item_lowrankclaw,
+        "health": 60,
+        "maxhealth": 60,
+        "rarity": 3}
 
-# gargoyles
-npc_gargoyle = {
-    'name': 'gargoyle',
-    'weapon': item_lowrankclaw,
-    "health": 85,
-    "maxhealth": 85,
-    "rarity": 3}
+    # gargoyles
+    npc_gargoyle = {
+        'name': 'gargoyle',
+        'weapon': item_lowrankclaw,
+        "health": 85,
+        "maxhealth": 85,
+        "rarity": 3}
 
-# the large sp-ider
-npc_largespider = {
-    'name': 'large spider',
-    'weapon': item_highrankbite,
-    "health": 65,
-    "maxhealth": 65,
-    "rarity": 4}
+    # the large sp-ider
+    npc_largespider = {
+        'name': 'large spider',
+        'weapon': item_highrankbite,
+        "health": 65,
+        "maxhealth": 65,
+        "rarity": 4}
 
-# Manticore
-npc_manticore = {
-    'name': 'manticore',
-    'weapon': item_highrankclaw,
-    "health": 125,
-    "maxhealth": 125,
-    "rarity": 4}
+    # Manticore
+    npc_manticore = {
+        'name': 'manticore',
+        'weapon': item_highrankclaw,
+        "health": 125,
+        "maxhealth": 125,
+        "rarity": 4}
 
-# ghost samurai
-npc_ghostsamurai = {
-    'name': 'ghost samurai',
-    'weapon': item_katana,
-    "health": 100,
-    "maxhealth": 100,
-    "rarity": 4}
+    # ghost samurai
+    npc_ghostsamurai = {
+        'name': 'ghost samurai',
+        'weapon': item_katana,
+        "health": 100,
+        "maxhealth": 100,
+        "rarity": 4}
 
-# demigod
-npc_demigod = {
-    'name': 'demigod',
-    'weapon': item_highrankstaff,
-    "health": 150,
-    "maxhealth": 150,
-    "rarity": 5}
+    # demigod
+    npc_demigod = {
+        'name': 'demigod',
+        'weapon': item_highrankstaff,
+        "health": 150,
+        "maxhealth": 150,
+        "rarity": 5}
 
-# minotaur
-npc_minotaur = {
-    'name': 'minotaur',
-    'weapon': item_highrankclaw,
-    "health": 175,
-    "maxhealth": 175,
-    "rarity": 5}
+    # minotaur
+    npc_minotaur = {
+        'name': 'minotaur',
+        'weapon': item_highrankclaw,
+        "health": 175,
+        "maxhealth": 175,
+        "rarity": 5}
 
-# Necromancer - this guy runs the place. Only in final boss battle.
-npc_boss = {
-    'name': 'necromancer',
-    'weapon': item_bossstaff,
-    "health": 250,
-    "maxhealth": 250,
-    "rarity": 0}
+    # Necromancer - this guy runs the place. Only in final boss battle.
+    npc_boss = {
+        'name': 'necromancer',
+        'weapon': item_bossstaff,
+        "health": 250,
+        "maxhealth": 250,
+        "rarity": 0}
 
-# enemies must be added in here to be a part of the game.
-enemypool = [npc_rat, npc_skeletonknight, npc_skeletonarcher, npc_zombie, npc_ghost, npc_goblin, npc_gargoyle, npc_demigod, npc_manticore, npc_spider, npc_largespider, npc_minotaur, npc_silverfish, npc_ghostsamurai]
+    # enemies must be added in here to be a part of the game.
+    enemypool = [npc_rat, npc_skeletonknight, npc_skeletonarcher, npc_zombie, npc_ghost, npc_goblin, npc_gargoyle, npc_demigod, npc_manticore, npc_spider, npc_largespider, npc_minotaur, npc_silverfish, npc_ghostsamurai]
 
-"""
+    """
 Locations/Rooms
 
 init locations. even simpler definition.
 
 format: location name, location description, and location rarity (1-5).
-"""
+    """
 
-# Throne Room
-room_throneroom = {
-    'name': 'a degraded throne room',
-    'desc': """You see a large expance. In front of you, you see a large throne with 2 portraits.
+    # Throne Room
+    room_throneroom = {
+        'name': 'a degraded throne room',
+        'desc': """You see a large expance. In front of you, you see a large throne with 2 portraits.
 On the floor you see shattered vaces, rotten flowers, and articles of clothing. Some poor soul had to live in this place...
 """,
-    'rarity': 5}
+        'rarity': 5}
 
-# Dining Room
-room_diningroom = {
-    'name': 'a degraded dining room',
-    'desc': """You see a large wooden table, with dishes left on it. On the floor, you see more plates, most of them shattered.
+    # Dining Room
+    room_diningroom = {
+        'name': 'a degraded dining room',
+        'desc': """You see a large wooden table, with dishes left on it. On the floor, you see more plates, most of them shattered.
 You can see lavish decorations all over the room. Flies buzz all around the room. Who would eat here anymore?
 """,
-    'rarity': 4}
+        'rarity': 4}
 
-# Armory
-room_armory = {
-    'name': 'a large armory',
-    'desc': """In front of you, you see several suits of armor. Some of these suits of armor have broken apart over time.
+    # Armory
+    room_armory = {
+        'name': 'a large armory',
+        'desc': """In front of you, you see several suits of armor. Some of these suits of armor have broken apart over time.
 You also see large shields between each suit, depicting a yellow lion over a red background. 
 """,
-    'rarity': 4}
+        'rarity': 4}
 
-#A room with a lot of plants.
-room_overgrowth = {
-    'name': 'a room covered in a massive overgrowth',
-    'desc': """All over you, you see large plants growing from the cracks in the walls. You see vines hanging from the ceiling.
+    #A room with a lot of plants.
+    room_overgrowth = {
+        'name': 'a room covered in a massive overgrowth',
+        'desc': """All over you, you see large plants growing from the cracks in the walls. You see vines hanging from the ceiling.
 This room has not been maintained for years...
 """,
-    'rarity': 2}
+        'rarity': 2}
 
-#blank space
-room_empty = {
-    'name': 'an empty room',
-    'desc': """The entire room is empty, with apparently nothing to be found in all directions...
+    #blank space
+    room_empty = {
+        'name': 'an empty room',
+        'desc': """The entire room is empty, with apparently nothing to be found in all directions...
 """,
-    'rarity': 2}
+        'rarity': 2}
 
-#ruins
-room_ruins = {
-    'name': 'a pile of ruins',
-    'desc': """You see remmnants of a massive building from centuries' past. Large pieces of stone litter the ground.
+    #ruins
+    room_ruins = {
+        'name': 'a pile of ruins',
+        'desc': """You see remmnants of a massive building from centuries' past. Large pieces of stone litter the ground.
 These ruins seem to come from a temple of a religious purpose...
 """,
-    'rarity': 3}
+        'rarity': 3}
 
-#room filled with bones
-room_bones = {
-    'name': 'a room filled with bones',
-    'desc': """Around you, you see thousands upon thousands of bones.
+    #room filled with bones
+    room_bones = {
+        'name': 'a room filled with bones',
+        'desc': """Around you, you see thousands upon thousands of bones.
 Many of them seem to be from fallen explorers who have dared to explore this place...
 """,
-    'rarity': 4}
+        'rarity': 4}
 
-# The final boss room. Not in the location pool as it's forced onto the player after we get the gold coins.
-room_finalboss = {
-    'name': 'a large empty room',
-    'desc': """The entire room is empty, with nothing to be found in all directions...
+    # The final boss room. Not in the location pool as it's forced onto the player after we get the gold coins.
+    room_finalboss = {
+        'name': 'a large empty room',
+        'desc': room_empty['desc'] + """
 
 However, as you begin to investigate, a portal opens at the front of the room.
 A large ghastly figure emerges from the portal. This must be the 'mystic figure'
 the legends hinted at.
 
 You ready your """ + item_sword['name'].replace("their ", "") + ".",
-    'rarity': 0}
+        'rarity': 0}
 
-# locations must be added in here to be a part of the game.
-locationpool = [room_throneroom, room_diningroom, room_armory, room_overgrowth, room_empty, room_ruins, room_bones]
-
-## direction/location stuff
-
-def getDirection():
-    global direction
-    global playerLocation
-
-    # i don't like this...
-    if direction in command_dir_left:
-        playerLocation[0] +=1 
-        return command_dir_left[0]
-    elif direction in command_dir_right:
-        playerLocation[0] -= 1
-        return command_dir_right[0]
-    elif direction in command_dir_forward:
-        playerLocation[1] += 1 
-        return command_dir_forward[0]
-    elif direction in command_dir_backward:
-        playerLocation[1] -= 1
-        return command_dir_backward[0]
-
-## difficulty stuff
-
-def getDifficulty():
-    global difficulty
-    global command_difficulty_easy, command_difficulty_normal, command_difficulty_hard
-
-    # i don't like this...
-    if difficulty in command_difficulty_easy:
-        return command_difficulty_easy[0]
-    elif difficulty in command_difficulty_normal:
-        return command_difficulty_normal[0]
-    elif difficulty in command_difficulty_hard:
-        return command_difficulty_hard[0]
+    # locations must be added in here to be a part of the game.
+    locationpool = [room_throneroom, room_diningroom, room_armory, room_overgrowth, room_empty, room_ruins, room_bones]
 
 ## stat level manipuation
 
@@ -1031,6 +1338,26 @@ def decreaseHealth(amount):
         if playerHealth <= 0:
             playerHealth = 0
 
+## direction/location stuff
+
+def getDirection():
+    global direction
+    global playerLocation
+
+    # i don't like this...
+    if direction in command_dir_left:
+        playerLocation[0] +=1 
+        return command_dir_left[0]
+    elif direction in command_dir_right:
+        playerLocation[0] -= 1
+        return command_dir_right[0]
+    elif direction in command_dir_forward:
+        playerLocation[1] += 1 
+        return command_dir_forward[0]
+    elif direction in command_dir_backward:
+        playerLocation[1] -= 1
+        return command_dir_backward[0]
+
 ## "user interface"
         
 def playerStats():
@@ -1088,6 +1415,8 @@ def enemyStats(enemy):
     enemyStats = "\n--------------------\n|Name: " + enemy['name'].title() + "|\n|Health: " + str(
         enemy['health']) + "/" + str(enemy['maxhealth']) + "|\n--------------------\n"
     print(enemyStats)
+
+## GAMEPLAY
 
 ## combat
 
@@ -1238,6 +1567,7 @@ def combat(enemy, hasDodged, hasBlocked):
     global minattack_afterblock_toughenemy, maxattack_afterblock_toughenemy
     global minblock, maxblock
     global minblock_toughenemy, maxblock_toughenemy
+    global gamestate, currEnemy, attacking, dodging, blocking
 
     # This is so we know we dodged from an enemy.
     dodged = False
@@ -1253,10 +1583,8 @@ def combat(enemy, hasDodged, hasBlocked):
         "maxhealth": enemy['maxhealth'],
         'rarity': enemy['rarity']}
 
-    choice = input("What do you want to do? " +
-                   command_combat_attack[0].title() + "/" + command_combat_attack[1] + ", " +
-                   command_combat_dodge[0] + "/" + command_combat_dodge[1] + " or " +
-                   command_combat_block[0] + "/" + command_combat_block[1] + "?: ")
+    # get user input
+    choice = getParserForGameState()
 
     mina = minattack
     maxa = maxattack
@@ -1287,8 +1615,11 @@ def combat(enemy, hasDodged, hasBlocked):
         minb = minblock_toughenemy
         maxb = maxblock_toughenemy
 
+    # get commands
+    commands = getCommandsForGameState()
+
     # check if we are putting in a valid command.
-    if choice in combatCommands:
+    if choice in commands:
         if choice in command_combat_attack:
             print("\n" + playerName + " begins to attack!")
             attackEnemy(clonecombatenemy, mina, maxa, checkDefiniteAttack(clonecombatenemy, hasDodged, hasBlocked))
@@ -1304,26 +1635,19 @@ def combat(enemy, hasDodged, hasBlocked):
             elif hasBlocked == True:
                 print("\nYou must attack again, and then block!")
                 blocked = True
-    elif choice not in combatCommands:
+    elif choice not in commands:
         print("\nYou cannot do that.")
 
     # attack is only initial
-    combatLoop(clonecombatenemy, False, dodged, blocked)
+    currEnemy = clonecombatenemy
+    attacking = False
+    dodging = dodged
+    blocking = blocked
+    gamestate = 2
 
 ## navigation/exploration
-
-def takeABreath(enemy):
-    global staminaToAddAfterRunning
     
-    breathtext = """You stop for a moment to take a deep breath after running from the """ + enemy['name'] + """.
-After calming down, you continue your journey.
-
-+""" + str(staminaToAddAfterRunning) + """ Stamina
-"""
-    increaseStamina(staminaToAddAfterRunning)
-    print(breathtext)
-    
-
+# when we first encounter an enemy
 def firstEnemyEncounter(enemy):
     global staminaToReduceWhileRunning
     global command_encounter_fight, command_encounter_run
@@ -1337,14 +1661,23 @@ def firstEnemyEncounter(enemy):
     global maxXsteps
     global runStaminamin, runStaminamax
     global command_difficulty_easy
+    global gamestate, currEnemy, attacking, dodging, blocking
+    global staminaToAddAfterRunning
+    global breathtextrunning
 
-    choice = input("What do you want to do? " + command_encounter_fight[0].title() + 
-                   "/" + command_encounter_fight[1] + " or " + command_encounter_run[0] + "/" + command_encounter_run[1] + "?: ")
+    # get user input
+    choice = getParserForGameState()
+    commands = getCommandsForGameState()
 
     # check if we are putting in a valid command.
-    if choice in encounterCommands:
+    if choice in commands:
         if choice in command_encounter_fight:
-            combatLoop(enemy, False, False, False)
+            # hop into combat
+            currEnemy = enemy
+            attacking = False
+            dodging = False
+            blocking = False
+            gamestate = 2
         elif choice in command_encounter_run:
             # "ai" for enemy agressiveness.
             minimum = minEnemyAttacksPlayer
@@ -1356,22 +1689,31 @@ def firstEnemyEncounter(enemy):
 
             attackval = random.randint(minimum, maximum)
             if attackval == maximum:
+                # enemy attacks!
                 print("\nYou try to run away from the " +
                       enemy['name'] + ", but they begin to attack!")
-                combatLoop(enemy, True, False, False)    
+                currEnemy = enemy
+                attacking = True
+                dodging = False
+                blocking = False
+                gamestate = 2
             elif attackval < maximum:
+                # reduce stamina when we run
                 print("\nYou run away from the " +
                       enemy['name'] + ".\n")
                 reduceStamina(staminaToReduceWhileRunning)
 
                 if (getDifficulty() == command_difficulty_easy[0]):
-                    takeABreath(enemy)
+                    increaseStamina(staminaToAddAfterRunning)
+                    print(breathtextrunning)
                 else:
                     regenStamina = random.randint(runStaminamin, runStaminamax)
 
                     if (regenStamina == runStaminamax):
-                        takeABreath(enemy)
-                
+                        increaseStamina(staminaToAddAfterRunning)
+                        print(breathtextrunning)
+
+                # randomly run on both the y and x axis
                 playerLocation[1] += runYSteps
                 runXsteps = 0
                 while runXsteps < maxXsteps:
@@ -1384,13 +1726,16 @@ def firstEnemyEncounter(enemy):
                         playerLocation[0] -= runXStepsval
                         
                     runXsteps += 1
-                    
-                gameLoop()
-                                
-    elif choice not in encounterCommands:
-        print("\nYou cannot do that.\n")
-        firstEncounterLoop(enemy)
 
+                # reset state.
+                currEnemy = npc_null
+                attacking = False
+                dodging = False
+                blocking = False
+                gamestate = 0
+                                
+    elif choice not in commands:
+        print("\nYou cannot do that.\n")
 
 def move():
     global doesPlayerHaveGoldCoinPowers
@@ -1401,9 +1746,8 @@ def move():
     global initalspawn, playerLocation
 
     # Get direction then move in that direction.
-    direction = input("Choose where you want to go; " + command_dir_left[0] + "/" + command_dir_left[1] + ", " +
-                      command_dir_right[0] + "/" + command_dir_right[1] + ", " + command_dir_forward[0] + "/" + command_dir_forward[1] +
-                      ", or " + command_dir_backward[0] + "/" + command_dir_backward[1] + ": ")
+    direction = getParserForGameState()
+    commands = getCommandsForGameState()
     command_dir_backward
     additionaltext = ""
 
@@ -1412,7 +1756,7 @@ def move():
     # this calls getDirection, which sets our location.
     direct = getDirection()
     
-    if direction in dirCommands: 
+    if direction in commands: 
         isGettingOutofDungeon = False
         if direction in command_dir_forward:
              additionaltext = "in front of you"
@@ -1438,15 +1782,13 @@ def move():
             encounter()
         elif isGettingOutofDungeon == True:
             print("\nYou cannot get out of the dungeon...\n")
-    elif direction not in dirCommands:
+    elif direction not in commands:
         print("\nYou cannot go that way.\n")
-
-    gameLoop()
-
 
 def encounter():
     global doesPlayerHaveGoldCoinPowers
     global stepsToLair, maxStepsToLair
+    global gamestate, currEnemy, attacking, dodging, blocking
 
     if doesPlayerHaveGoldCoinPowers == False:
         # play the game as normal.
@@ -1464,13 +1806,14 @@ def encounter():
             enemy = npc_boss
             # capitalize all words in enemy name. (https://www.tutorialspoint.com/python/string_title.htm)
             print("You encounter the " + enemy['name'].title() + "!")
-            combatLoop(enemy, False, False, False)
+            currEnemy = enemy
+            attacking = False
+            dodging = False
+            blocking = False
+            gamestate = 2
         elif stepsToLair != maxStepsToLair:
             # play the game as normal.
             encounterLogic()
-
-    # continue game loop if we are not in combat.
-    gameLoop()
 
 def checkValidEncounter():
     global minStepsToDiscover
@@ -1519,6 +1862,7 @@ def encounterLogic():
     global enemyMinRarity, enemyMaxRarity
     global itemMinRarity, itemMaxRarity
     global minduel, maxduel
+    global gamestate, currEnemy, attacking, dodging, blocking
 
     # don't discover anything if we are at initial spawn or we
     if playerLocation != [0,0] and checkValidEncounter():
@@ -1540,10 +1884,15 @@ def encounterLogic():
             if duel == maxduel:
                enemy2 = dualEnemies(enemy)
                print("You encounter a " + enemy2['name'] + "!\n")
-               firstEncounterLoop(enemy2)
+               currEnemy = enemy2
             elif duel != maxduel:
                print("You encounter a " + enemy['name'] + "!\n")
-               firstEncounterLoop(enemy)
+               currEnemy = enemy
+
+            attacking = False
+            dodging = False
+            blocking = False
+            gamestate = 1
         elif enemy['rarity'] != enemyrarity:
             # spawn an item if there are no enemies?
             itemrarity = random.randint(itemMinRarity, itemMaxRarity)
@@ -1615,7 +1964,9 @@ Your maximum health is now """ + str(maxPlayerHealth) + """!
                                     increaseStamina(item['staminatouse'])
                                 elif playerStamina >= maxPlayerStamina:
                                     print(itemleavestring)
+                    # if the item is a trap, damage us
                     elif item['istrap'] == True:
+                        # for items with both health and stamina, check those first
                         if item['healthtouse'] > 0 and item['staminatouse'] > 0:
                             print(itemstring + "\n" + itemhealthstring + "\n" + itemstaminastring + "\n")
                             decreaseHealth(item['healthtouse'])
@@ -1635,6 +1986,7 @@ Your maximum health is now """ + str(maxPlayerHealth) + """!
 
 def gameStart():
     global gametitle, gameversion, gamecodename
+    global gamestate
 
     # fancy title (https://www.tutorialspoint.com/python/python_strings.htm)
     fancytitle = ' '.join(gametitle).upper()
@@ -1642,137 +1994,188 @@ def gameStart():
     print(fancytitle + "\n" + gameversion +
           "\nCodename: " + gamecodename, end='\n\n')
 
-    # tell the player to name themselves.
-    difficultySelect()
-    #namePlayer()
+    # tell the player to set difficulty.
+    gamestate = -3
 
 def difficultySelect():
     global command_difficulty_easy, command_difficulty_normal, command_difficulty_hard
     global difficulty
     global command_bootup_yes, command_bootup_no
+    global gamestate
 
     # ask if the player wants to begin
-    difficulty = input("Type " +
-                       command_difficulty_easy[0] + "/" + command_difficulty_easy[1] + " for the " + command_difficulty_easy[0].title() + " difficulty,\n" +
-                       command_difficulty_normal[0] + "/" + command_difficulty_normal[1] + " for the " + command_difficulty_normal[0].title() + " difficulty, or\n" +
-                       command_difficulty_hard[0] + "/" + command_difficulty_hard[1] + " for the " + command_difficulty_hard[0].title() + " difficulty: ")
+    difficulty = getParserForGameState()
+    commands = getCommandsForGameState()
 
-    if difficulty in difficultySelectCommands:
+    if difficulty in commands:
         print("\nThe difficulty has been set to " + getDifficulty().title() + ".")
         adjustDifficulty()
-        namePlayer()
-    elif difficulty not in difficultySelectCommands:
+        gamestate = -2
+    elif difficulty not in commands:
         print("\nThat isn't an option.\n")
-        difficultySelect()
+        gamestate = -3
 
 def namePlayer():
     global playerName
     global minNameLength
+    global gamestate
 
     # we need the player name for the intro sequence.
-    playerName = input("Please enter your name to proceed: ")
+    playerName = getParserForGameState()
 
     # check player name length.
     if len(playerName) >= minNameLength:
-        storyPrologue(False)
+        gamestate = -1
     elif len(playerName) < minNameLength and len(playerName) > 0:
         print("\nYour name is too short. Try again.\n")
-        namePlayer()
+        gamestate = -2
     elif len(playerName) <= 0:
         print("\nYou must provide a name to continue. Try again.\n")
-        namePlayer()
+        gamestate = -2
 
 
 def storyPrologue(isFixingMistake):
     global playerName
     global goldCoinsNeeded
     global command_bootup_yes, command_bootup_no
-
-    # dialogue
-    starttext = """
-May 5th, 1394:
-
-You are """ + playerName + """, the Royal Guard for the King.
-
-You're rushing down a long, dark path on your horse.
-There's been a dramatic turn of events.
-    
-You recently got a letter from the King, stating that the kingdom is in need of your services.
-It's been under attack by paranormal beings beyond this material world.
-After many weeks, the King was informed of the location of these beings.
-
-A large dungeon was identified as being the main home for all these ghastly beasts roaming the kingdom.
-This specific dungeon is a magical dungeon, which has a life of its own.
-It builds itself around any living inhabitants and summons beasts, items, traps, and locations.
-The dungeon also inhabits faeries that have magical healing properties.
-
-As sworn Royal Guard for the King, you must protect the kingdom from these beasts by slaying them in this living dungeon.
-
-You have also heard of a mythic legend where """ + str(goldCoinsNeeded) + """ golden coins were spread all over the dungeon.
-These coins give the possessor immense boosts of strength. They also will lead you to a 'mystic figure' that rules the dungeon.
-Defeat the figure, and you will be able to escape from the dungeon.
-The legends also hinted at an 'event' that would happen due to that, but they weren't specific.
-
-After that, you took your """ + item_sword['name'].replace("their ", "") + """ and your horse down this dark passage.
-
-You stand before a mighty doorway. You go towards it, but you are unsure if you are ready.
-"""
-
-    proceedtext = """
-You walk towards the large doorway.
-The dungeon seems like a large maze at first.
-You slice your sword into the ground to mark where you are, then you proceed through the hallway.
-"""
-
-    gohometext = """
-You go back on your horse towards the kingdom.
-You tell the king you were too cowardly to attack the beasts.
-The King fires you, and the kingdom continues to be invaded by the paranormal.
-
-G A M E  O V E R ."""
+    global gamestate
+    global starttext, proceedtext, gohometext
 
     if isFixingMistake == False:
         # print the start text
         print(starttext)
 
     # ask if the player wants to begin
-    proceed = input("Type " + command_bootup_yes[0] + "/" + command_bootup_yes[1] + " if you are ready to proceed, or " +
-                    command_bootup_no[0] + "/" + command_bootup_no[1] + " if you just want to go home: ")
-    if proceed in bootupCommands:
+    proceed = getParserForGameState()
+    commands = getCommandsForGameState()
+    if proceed in commands:
         if proceed in command_bootup_yes:
             print(proceedtext)
-            gameLoop()
+            gamestate = 0
         elif proceed in command_bootup_no:
             print(gohometext)
             stop()
-    elif proceed not in bootupCommands:
+    elif proceed not in commands:
         print("\nThat isn't an option.\n")
         storyPrologue(True)
 
-def gameLoop():
-    global minRevive
-    global maxRevive
+def triggerCombat():
+    global playerHealth
+    global currEnemy, attacking, dodging, blocking
 
-    deadtext = """You have been taken down by one of the dungeon's traps.
+    enemyattacktext = "\nThe " + currEnemy['name'] + " strikes you down with " + \
+        currEnemy['weapon'].get('name') + " while you were trying to escape!" + \
+        ("\n" + currEnemy['weapon'].get('desc') if currEnemy['weapon'].get('desc') != "none" else "")
 
-The kingdom is now in grave danger as hordes of paranormal beings overwhelm
-the King's forces. Everyone tries to evacuate, but it is too late.
+    if attacking == True:
+        print(enemyattacktext)
+        enemyDamage(currEnemy)
 
-G A M E  O V E R."""
-
-    revivetext = """After you have been attacked by one of the dungeon's traps, you collapse and you slowly begin to see the light.
-
-As your vision starts to blur, you notice the image of a faerie.
-Miraculously, the faerie fully revitalizes you and brings you back to life.
-
-+""" + str(maxPlayerHealth) + """ Health
-+""" + str(maxPlayerStamina) + """ Stamina"""
-    
-    # if we have over 0 health, display stats and ask which direction to go.
     if playerHealth > 0:
+        enemyStats(currEnemy)
+        playerStats()
+        combat(currEnemy, dodging, blocking)
+
+## simple function that pauses the dialog then exits.
+def stop():
+    input("\nPress any key to exit...")
+    exit()
+
+## GAME LOOP
+
+while playerHealth > 0:
+    # update text and objects
+    updateText()
+    updateObjects()
+
+    # -4: start the game
+    if gamestate == -4:
+        gameStart()
+    #-3: difficulty select
+    elif gamestate == -3:
+        difficultySelect()
+    #-2: name change
+    elif gamestate == -2:
+        namePlayer()
+    #-1: story
+    elif gamestate == -1:
+        storyPrologue(False)
+    #0: exploring
+    elif gamestate == 0:
         playerStats()
         move()
-    elif playerHealth <= 0:
+    #1: enemy encounter
+    elif gamestate == 1:
+        playerStats()
+        firstEnemyEncounter(currEnemy)
+    #2: combat
+    elif gamestate == 2:
+        """
+if we have over 0 health, continue combat loop if the enemy is alive. also sisplay stats
+if we win the battle, regenerate some of the stamina and display win text.
+if we have 0 or loawer health, lock the health at 0, display stats, then display the death text.
+        """
+        if currEnemy['health'] <= 0:
+            currEnemy['health'] = 0
+            # give us more stamina if we are under minimum stamina!
+            # also, heal us if we are under the minimum health
+            if currEnemy['name'] != npc_boss['name']:
+                if playerStamina < minStaminaToGetLowDamage:
+                    increaseStamina(bonusstamina)
+                    print(wintext + breathtextalt)
+                elif (playerStamina == minStaminaToGetLowDamage) or (playerStamina > minStaminaToGetLowDamage):
+                    increaseStamina(staminaToRegenAfterCombat)
+                    print(wintext + breathtext)
+                    
+                if playerHealth <= minHealthForLowHealth:
+                    increaseHealth(healthToRegenAfterCombat)
+                    print(refillhealthtext)
+
+                # reset state
+                currEnemy = npc_null
+                attacking = False
+                dodging = False
+                blocking = False
+                gamestate = 0
+            elif currEnemy['name'] == npc_boss['name']:
+                # reset state and display ending
+                currEnemy = npc_null
+                attacking = False
+                dodging = False
+                blocking = False
+                gamestate = 0
+                playerStats()
+                print(wintext_boss)
+                stop()
+        elif currEnemy['health'] > 0:
+                # continue combat loop
+                triggerCombat()
+
+# player death event        
+if playerHealth <= 0:
+    if gamestate == 2:
+        minr = minRevive
+        maxr = maxRevive
+
+        #higher chance to revive if we are fighting a tough enemy.
+        if currEnemy['health'] > minToughEnemyHP:
+            minr = minRevive_toughenemy
+            maxr = maxRevive_toughenemy
+
+        #revive the player?
+        reviveval = random.randint(minr, maxr)
+        if reviveval == maxRevive:
+            print(combatrevivetext)
+            setHealth(maxPlayerHealth)
+            setStamina(maxPlayerStamina)
+            triggerCombat()
+        elif reviveval != maxRevive:
+            enemyStats(currEnemy)
+            playerStats()
+            print(deadtext)
+            stop()
+    elif gamestate == 0:
+        #revive the player?
         reviveval = random.randint(minRevive, maxRevive)
         if reviveval == maxRevive:
             print(revivetext)
@@ -1781,168 +2184,6 @@ Miraculously, the faerie fully revitalizes you and brings you back to life.
             playerStats()
             move()
         elif reviveval != maxRevive:
-            onPlayerDeath(deadtext)
-
-
-def firstEncounterLoop(enemy):
-    global minRevive, maxRevive
-    global playerHealth
-    
-    if playerHealth > 0:
-        playerStats()
-        firstEnemyEncounter(enemy)
-
-def triggerCombat(enemy, attack, dodged, blocked):
-    global playerHealth
-
-    if attack == True:
-        print("\nThe " + enemy['name'] +
-                " strikes you down with " + enemy['weapon'].get('name') + " while you were trying to escape!" +
-              ("\n" + enemy['weapon'].get('desc') if enemy['weapon'].get('desc') != "none" else ""))
-        enemyDamage(enemy)
-        if playerHealth <= 0:
-            combatLoop(enemy, attack, dodged, blocked)
-        
-    enemyStats(enemy)
-    playerStats()
-    combat(enemy, dodged, blocked)
-
-def combatLoop(enemy, attack, dodged, blocked):
-    global playerHealth, maxPlayerHealth
-    global staminaToRegenAfterCombat, additionalStaminaToRegenAfterCombat, minStaminaToGetLowDamage
-    global playerStamina, maxPlayerStamina
-    global healthToRegenAfterCombat
-    global minHealthForLowHealth
-    global minheal, maxheal
-    global minRevive, maxRevive
-    global minToughEnemyHP
-    global minRevive_toughenemy, maxRevive_toughenemy
-    global maxGoldCoinsToWin
-
-    wintext = """
-The """ + enemy['name'] + " has been slayed!"
-
-    wintext_boss = """The """ + enemy['name'] + """ has been slayed!
-
-You have saved the kingdom from a threat like no other.
-The hordes of supernatural invaders suddenly vanish throughout the dungeon and the kingdom.
-
-Although, as a result of your success, you feel the quakes of the now unstable dungeon.
-Your gold coins make a chatter in your pocket, and suddenly, a portal opens behind you.
-
-You go through the portal and end up where you started. You hop onto your horse and race back to the kingdom.
-You see the dungeon fall apart. The spirits inhabiting the abandoned rooms can finally rest.
-
-When you arrive to the kingdom, the King welcomes you with open arms as a large crowd cheers upon your arrival.
-
-A day later, the King officially announces your success to the kingdom to an equally loud roar from an even larger crowd.
-The King declares you as the next person in line to become King.
-
-After the celebration, the King asks you to come with him to his quarters.
-He pulls out a legendary sword known as the DUNGEONBLADE. Only the King's trusted men can use this sword, and you are its next owner.
-
-The King gives you the sword. When examining the blade, you notice """ + str(maxGoldCoinsToWin) + """ coin-sized holes embedded in the blade.
-You insert the coins into the blade, and they fill the empty space to become one with the metal.
-
-A blue fire surrounds the sword blade as you hold it firmly in your grasp. No supernatural being ever will attack the kingdom again.
-
-Meanwhile, a pair of small, glowing red eyes peer out from the ruins of the dungeon. Red eyes that peer out for revenge...
-
-T H E  E N D ."""
-
-    deadtext = "You have been defeated by the " + enemy['name'] + """.
-
-The kingdom is now in grave danger as hordes of paranormal beings overwhelm
-the King's forces. Everyone tries to evacuate, but it is too late.
-
-G A M E  O V E R."""
-
-    """
-if we have over 0 health, continue combat loop if the enemy is alive. also sisplay stats
-if we win the battle, regenerate some of the stamina and display win text.
-if we have 0 or loawer health, lock the health at 0, display stats, then display the death text.
-    """
-
-    breathtext = """
-You take a deep breath after the battle.
-After calming down, you continue your journey.
-
-+""" + str(staminaToRegenAfterCombat) + """ Stamina
-"""
-
-    bonusstamina = additionalStaminaToRegenAfterCombat + staminaToRegenAfterCombat
-
-    breathtextalt = """
-You take a deep breath after the battle for an extended amount of time.
-After calming down, you continue your journey.
-
-+""" + str(bonusstamina) + """ Stamina
-"""
-
-    refillhealthtext = """Suddenly, you see a faerie floating around.
-The faerie notices that you are hurt, and as such it heals most of your wounds.
-
-+""" + str(healthToRegenAfterCombat) + """ Health
-"""
-
-    revivetext = """
-After the strike from the """ + enemy['name'] + """, you collapse and you slowly begin to see the light.
-
-As your vision starts to blur, you notice the image of a faerie.
-Miraculously, the faerie fully revitalizes you and brings you back to life.
-
-+""" + str(maxPlayerHealth) + """ Health
-+""" + str(maxPlayerStamina) + """ Stamina"""
-
-    if playerHealth > 0:
-        if enemy['health'] <= 0:
-            enemy['health'] = 0
-            # give us more stamina if we are under 50 stamina!
-            if enemy['name'] != npc_boss['name']:
-                if playerStamina < minStaminaToGetLowDamage:
-                    increaseStamina(bonusstamina)
-                    print(wintext + breathtextalt)
-                elif (playerStamina == minStaminaToGetLowDamage) or (playerStamina > minStaminaToGetLowDamage):
-                    increaseStamina(staminaToRegenAfterCombat)
-                    print(wintext + breathtext)
-                if playerHealth <= minHealthForLowHealth:
-                    increaseHealth(healthToRegenAfterCombat)
-                    print(refillhealthtext)
-                gameLoop()
-            elif enemy['name'] == npc_boss['name']:
-                playerStats()
-                print(wintext_boss)
-                stop()
-        elif enemy['health'] > 0:
-            triggerCombat(enemy, attack, dodged, blocked)
-    elif playerHealth <= 0:
-        minr = minRevive
-        maxr = maxRevive
-
-        if enemy['health'] > minToughEnemyHP:
-            minr = minRevive_toughenemy
-            maxr = maxRevive_toughenemy
-        
-        reviveval = random.randint(minr, maxr)
-        if reviveval == maxRevive:
-            print(revivetext)
-            setHealth(maxPlayerHealth)
-            setStamina(maxPlayerStamina)
-            triggerCombat(enemy, attack, dodged, blocked)
-        elif reviveval != maxRevive:
-            enemyStats(enemy)
-            onPlayerDeath(deadtext)
-
-def onPlayerDeath(deadtext):
-    playerStats()
-    print(deadtext)
-    stop()
-
-## simple function that pauses the dialog then exits.
-
-def stop():
-    input("\nPress any key to exit...")
-    exit()
-
-## run program
-gameStart()
+            playerStats()
+            print(deadtextdungeon)
+            stop()
