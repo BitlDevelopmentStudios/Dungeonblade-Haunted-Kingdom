@@ -1,4 +1,4 @@
-# Dungeonblade-Haunted-Kingdom
+# ![Logo](https://github.com/BitlDevelopmentStudios/Dungeonblade-Haunted-Kingdom/raw/master/graphics/logo.png)
 Codename: Star Dancer
 
 Made this during my game development class for an assignment.
