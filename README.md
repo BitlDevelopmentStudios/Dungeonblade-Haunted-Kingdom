@@ -1,4 +1,4 @@
-# ![Logo](https://github.com/BitlDevelopmentStudios/Dungeonblade-Haunted-Kingdom/raw/master/graphics/logo.png)
+# ![Logo](https://raw.githubusercontent.com/BitlDevelopmentStudios/Dungeonblade-Haunted-Kingdom/main/graphics/logo.png)
 Codename: Star Dancer
 
 Made this during my game development class for an assignment.
