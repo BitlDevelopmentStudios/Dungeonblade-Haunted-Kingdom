@@ -48,9 +48,11 @@ You stand before a mighty doorway. You go towards it, but you are unsure if you 
 ## Other info:
 Codename: Star Dancer
 
-Itch.io page: https://bitl.itch.io/dungeonblade-hk
+Compiled releases on the itch.io page: https://bitl.itch.io/dungeonblade-hk
 
 Report bugs here: https://github.com/BitlDevelopmentStudios/Dungeonblade-Haunted-Kingdom/issues
+
+Pre-Release builds here: https://github.com/BitlDevelopmentStudios/Dungeonblade-Haunted-Kingdom/releases
 
 # Source Licence info:
 ![LGPL Logo](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)
