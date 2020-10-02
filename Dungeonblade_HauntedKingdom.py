@@ -63,6 +63,15 @@ room_null = {
     'desc': "",
     'rarity': 0}
 
+# since everything is unintialized, initialize any required items as null.
+itempool = []
+npc_boss = npc_null
+room_finalboss = room_null
+item_sword = item_nullweapon
+item_shield = item_nullweapon
+enemypool = []
+locationpool = []
+
 #current enemy
 currEnemy = npc_null
 # are we attacking?
@@ -404,12 +413,12 @@ The dungeon also inhabits faeries that have magical healing properties.
 
 As sworn Royal Guard for the King, you must protect the kingdom from these beasts by slaying them in this living dungeon.
 
-You have also heard of a mythic legend where """ + str(goldCoinsNeeded) + """ golden coins were spread all over the dungeon.
+You have also heard of a mythic legend where """ + str(goldCoinsNeeded) + """ placed in special locations all over the dungeon.
 These coins give the possessor immense boosts of strength. They also will lead you to a 'mystic figure' that rules the dungeon.
 Defeat the figure, and you will be able to escape from the dungeon.
-The legends also hinted at an 'event' that would happen due to that, but they weren't specific.
+The legends also hinted at an 'apocalyptic event' that would happen afterward, but they weren't specific.
 
-After that, you took your """ + item_sword['name'].replace("their ", "") + """ and your horse down this dark passage.
+After hearing that, you took your """ + item_sword['name'].replace("their ", "") + """, your """ + item_shield['name'].replace("their ", "") + """, and your horse down this dark passage.
 
 You stand before a mighty doorway. You go towards it, but you are unsure if you are ready.
 """
@@ -726,15 +735,6 @@ def getDifficulty():
 
 ## ITEMS, ENEMIES, AND EVIRONMENT.
 
-# since everything is unintialized, initialize any required items as null.
-itempool = []
-npc_boss = npc_null
-room_finalboss = room_null
-item_sword = item_nullweapon
-item_shield = item_nullweapon
-enemypool = []
-locationpool = []
-
 # update objects.
 def updateObjects():
     global itempool, enemypool, locationpool
@@ -776,7 +776,7 @@ there's also a description for each enemy weapon to describe the enemy's actions
     # Shield
     item_shield = {
         'name': 'their shield',
-        'desc': 'none',
+        'desc': 'The enemy blocks your attack!',
         'healthtouse': 0,
         'staminatouse': 0,
         "rarity": 0,
