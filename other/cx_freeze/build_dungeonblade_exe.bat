@@ -1,0 +1,2 @@
+python setupDungeonblade.py build
+pause
