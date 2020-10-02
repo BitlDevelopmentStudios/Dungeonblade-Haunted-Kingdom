@@ -52,6 +52,7 @@ Report bugs here: https://github.com/BitlDevelopmentStudios/Dungeonblade-Haunted
 
 # Source Licence info:
 ![LGPL Logo](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)
+
 Dungeonblade - Haunted Kingdom is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
