@@ -1342,20 +1342,15 @@ def decreaseHealth(amount):
 
 def getDirection():
     global direction
-    global playerLocation
 
     # i don't like this...
     if direction in command_dir_left:
-        playerLocation[0] +=1 
         return command_dir_left[0]
     elif direction in command_dir_right:
-        playerLocation[0] -= 1
         return command_dir_right[0]
     elif direction in command_dir_forward:
-        playerLocation[1] += 1 
         return command_dir_forward[0]
     elif direction in command_dir_backward:
-        playerLocation[1] -= 1
         return command_dir_backward[0]
 
 ## "user interface"
@@ -1759,14 +1754,20 @@ def move():
     if direction in commands: 
         isGettingOutofDungeon = False
         if direction in command_dir_forward:
-             additionaltext = "in front of you"
+            playerLocation[1] += 1
+            additionaltext = "in front of you"
         elif direction in command_dir_backward:
-            if playerLocation != [0,0]:
+            if playerLocation[1] != 0:
+                playerLocation[1] -= 1
                 additionaltext = "behind you"
-            elif playerLocation == [0,0]:
+            elif playerLocation[1] == 0:
                 additionaltext = ""
                 isGettingOutofDungeon = True
-        else:
+        elif direction in command_dir_left:
+            playerLocation[0] +=1
+            additionaltext = "on the " + direct
+        elif direction in command_dir_right:
+            playerLocation[0] -= 1
             additionaltext = "on the " + direct
 
         if isGettingOutofDungeon == False:
