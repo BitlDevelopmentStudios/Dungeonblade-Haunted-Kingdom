@@ -1657,23 +1657,23 @@ def dodgeEnemy(clonecombatenemy, minimum, maximum):
 def checkDefiniteAttack(enemy, hasDodged, hasBlocked):
     global minToughEnemyHP
 
-    if enemy['health'] > minToughEnemyHP:
+    if enemy['maxhealth'] > minToughEnemyHP:
         if hasBlocked == True:
             if test == True:
-                print("DEBUG: Definite attack...")
+                print("DEBUG: Tough Enemy: Definite attack...")
             return True
         elif hasBlocked == False:
             if test == True:
-                print("DEBUG: Indefinite attack...")
+                print("DEBUG: Tough Enemy: Indefinite attack...")
             return False
-    elif enemy['health'] <= minToughEnemyHP:
+    elif enemy['maxhealth'] <= minToughEnemyHP:
         if hasDodged == True:
             if test == True:
-                print("DEBUG: Definite attack...")
+                print("DEBUG: Enemy: Definite attack...")
             return True
         elif hasDodged == False:
             if test == True:
-                print("DEBUG: Indefinite attack...")
+                print("DEBUG: Enemy: Indefinite attack...")
             return False
 
 def combat(enemy, hasDodged, hasBlocked):
