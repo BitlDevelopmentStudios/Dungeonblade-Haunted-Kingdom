@@ -26,7 +26,7 @@ sys.setrecursionlimit(10000000)
 On easy, you don't encounter 2 enemies at once that much.
 With this var, you can encounter them more. Only used for play testing.
 """
-test = False
+test = True
 
 # the game title
 gametitle = "Dungeonblade - Haunted Kingdom"
@@ -590,22 +590,34 @@ def adjustDifficulty():
         if test == False:
             minduel = 1
             maxduel = 15
+            # probability for the enemy to attack the player before they start running.
+            minEnemyAttacksPlayer = 1
+            maxEnemyAttacksPlayer = 10
+            # probability for the tougher enemies to attack the player before they start running.
+            minToughEnemyAttacksPlayer = 1
+            maxToughEnemyAttacksPlayer = 5
             # maximum health
             maxPlayerHealth = 150
             # Maximum health after we get coins.
             maxPlayerHealthAfterCoins  = 250
             # maximum stamina
             maxPlayerStamina = 150
-        #Increase health more on test mode and increase probability of 2 enemies at once.
+        #Increase health more on test mode and increase probability of harder stuff.
         elif test == True:
             minduel = 1
-            maxduel = 5
+            maxduel = 2
+            # probability for the enemy to attack the player before they start running.
+            minEnemyAttacksPlayer = 1
+            maxEnemyAttacksPlayer = 6
+            # probability for the tougher enemies to attack the player before they start running.
+            minToughEnemyAttacksPlayer = 1
+            maxToughEnemyAttacksPlayer = 3
             # maximum health
-            maxPlayerHealth = 200
+            maxPlayerHealth = 1000
             # Maximum health after we get coins.
-            maxPlayerHealthAfterCoins  = 300
+            maxPlayerHealthAfterCoins  = 2000
             # maximum stamina
-            maxPlayerStamina = 200
+            maxPlayerStamina = 1000
 
         # the health
         playerHealth = maxPlayerHealth
@@ -645,12 +657,6 @@ def adjustDifficulty():
         # higher probability for the player to atttack tougher enemies after blocking.
         minattack_afterblock_toughenemy = 3
         maxattack_afterblock_toughenemy = 20
-        # probability for the enemy to attack the player before they start running.
-        minEnemyAttacksPlayer = 1
-        maxEnemyAttacksPlayer = 10
-        # probability for the tougher enemies to attack the player before they start running.
-        minToughEnemyAttacksPlayer = 1
-        maxToughEnemyAttacksPlayer = 5
         # dodge probability when fighting tougher enemies.
         mindodge_toughenemy = 1
         maxdodge_toughenemy = 10
