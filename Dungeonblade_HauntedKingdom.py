@@ -26,7 +26,7 @@ sys.setrecursionlimit(10000000)
 On easy, you don't encounter 2 enemies at once that much.
 With this var, you can encounter them more. Only used for play testing.
 """
-test = False
+test = True
 
 # the game title
 gametitle = "Dungeonblade - Haunted Kingdom"
@@ -51,7 +51,7 @@ gamestate = -4
 
 # blank objects.
 item_nullweapon = {
-    'name': "null",
+    'name': "null weapon",
     'desc': '',
     'healthtouse': 0,
     'staminatouse': 0,
@@ -59,13 +59,13 @@ item_nullweapon = {
     'isgold': False,
     'istrap': False}
 npc_null =  {
-    'name': '',
+    'name': 'null npc',
     'weapon': item_nullweapon,
     "health": 0,
     "maxhealth": 0,
     "rarity": 0}
 room_null = {
-    'name': 'null',
+    'name': 'null room',
     'desc': "",
     'rarity': 0}
 
@@ -277,7 +277,6 @@ proceedtext = ""
 gohometext = ""
 breathtextrunning = ""
 
-
 # update the text.
 def updateText():
     global wintextbase, wintext, wintext_boss
@@ -385,7 +384,9 @@ Faeries will most likely come to you.
 You are nearly invulnerable.
 """ + ("""
 NOTE: Test mode is enabled.
-This gives you even more power for the convienence of testing harder elements of """ + gametitle + ".\n" if test == True else "")
+This gives you even more power for the convienence of testing harder elements of """ + gametitle + """.
+
+You will also see debugging text for every element of the game for testing.""" if test == True else "")
 
     normaltext = "\n" + command_difficulty_normal[0].title() + """:
 You begin with relatively high confidence.
@@ -450,11 +451,16 @@ After calming down, you continue your journey.
 
 +""" + str(staminaToAddAfterRunning) + """ Stamina
 """
+    if test == True:
+        print("Text updated")
 
 ## COMMANDS
 
 # creates a string list for a command and aliases
 def outputCommandListForCommand(lst, uppercase):
+    if test == True:
+        print("Grabbing command list...")
+
     cmdList = ""
 
     first = lst[0]
@@ -472,6 +478,9 @@ def outputCommandListForCommand(lst, uppercase):
             elif uppercase == False:
                 cmdList += str(entry) + "/"
 
+    if test == True:
+        print("Command list is " + cmdList)
+
     return cmdList
 
 # grabs input depending on gamestate.
@@ -483,6 +492,9 @@ def getParserForGameState():
     global command_encounter_fight, command_encounter_run
     global command_combat_attack, command_combat_dodge, command_combat_block
     global test
+
+    if test == True:
+        print("Grabbing parser for game state " + str(gamestate))
 
     parser = ""
     
@@ -547,6 +559,9 @@ def getCommandsForGameState():
     elif gamestate == 2:
         commands = combatCommands
 
+    if test == True:
+        print("Commands for game state: " + str(commands))
+
     return commands
 
 ## difficulty stuff
@@ -593,13 +608,16 @@ def adjustDifficulty():
             maxduel = 2
             # probability for the enemy to attack the player before they start running.
             minEnemyAttacksPlayer = 1
-            maxEnemyAttacksPlayer = 6
+            maxEnemyAttacksPlayer = 3
             # probability for the tougher enemies to attack the player before they start running.
             minToughEnemyAttacksPlayer = 1
             maxToughEnemyAttacksPlayer = 3
             # maximum health
             maxPlayerHealth = 200
+            # Maximum health after we get coins.
+            maxPlayerHealthAfterCoins  = 300
             maxGoldCoinsToWin = 1
+            
         elif test == False:
             minduel = 1
             maxduel = 15
@@ -620,6 +638,8 @@ def adjustDifficulty():
             # the amount of stamina to reduce when running
             staminaToReduceWhileRunning = 1.2
             maxGoldCoinsToWin = 2
+            # the minimum amount of hp to consider us a tough enemy. the enemy's health must be over this. 
+            minToughEnemyHP = 200
 
         # the health
         playerHealth = maxPlayerHealth
@@ -665,8 +685,6 @@ def adjustDifficulty():
         # probability if we are going to be revived at 0 health for tougher enemies
         minRevive_toughenemy = 1
         maxRevive_toughenemy = 2
-        # the minimum amount of hp to consider us a tough enemy. the enemy's health must be over this. 
-        minToughEnemyHP = 200
         # minimum health to consider us being at low health.
         minHealthForLowHealth = 75
         # the amount of stamina to reduce when attacking
@@ -751,10 +769,16 @@ def adjustDifficulty():
     # used for bonus stamina.
     bonusstamina = additionalStaminaToRegenAfterCombat + staminaToRegenAfterCombat
 
+    if test == True:
+        print("Difficulty " + difficulty + "... initalized.")
+
 #get the main difficulty name.
 def getDifficulty():
     global difficulty
     global command_difficulty_easy, command_difficulty_normal, command_difficulty_hard
+
+    if test == True:
+        print("Difficulty is " + difficulty + "... Interpreting...")
 
     # i don't like this...
     if difficulty in command_difficulty_easy:
@@ -1089,6 +1113,9 @@ You put it in your pocket and continue your journey.
     # items must be added in here to be a part of the game. The sword/shield is given to the player by default so we don't include it.
     itempool = [item_smallfirstaid, item_firstaid, item_smallwater, item_water, item_goldcoin, item_potion, item_poison, item_beartrap, item_tripwire, item_pit, item_spikes, item_tripwireX2, item_spikesandpit]
 
+    if test == True:
+        print("Items initalized.")
+
     """
 Enemies
 
@@ -1220,6 +1247,9 @@ format: enemy name, enemy weapon, minimum health, maximum health, and rarity (an
     # enemies must be added in here to be a part of the game.
     enemypool = [npc_rat, npc_skeletonknight, npc_skeletonarcher, npc_zombie, npc_ghost, npc_goblin, npc_gargoyle, npc_demigod, npc_manticore, npc_spider, npc_largespider, npc_minotaur, npc_silverfish, npc_ghostsamurai]
 
+    if test == True:
+        print("Enemies initalized.")
+
     """
 Locations/Rooms
 
@@ -1287,7 +1317,6 @@ Many of them seem to be from fallen explorers who have dared to explore this pla
     room_finalboss = {
         'name': 'a large empty room',
         'desc': room_empty['desc'] + """
-
 However, as you begin to investigate, a portal opens at the front of the room.
 A large ghastly figure emerges from the portal. This must be the 'mystic figure'
 the legends hinted at.
@@ -1297,6 +1326,10 @@ You ready your """ + item_sword['name'].replace("their ", "") + ".",
 
     # locations must be added in here to be a part of the game.
     locationpool = [room_throneroom, room_diningroom, room_armory, room_overgrowth, room_empty, room_ruins, room_bones]
+
+    if test == True:
+        print("Locations initalized.")
+        print("Objects updated.")
 
 ## stat level manipuation
 
@@ -1315,6 +1348,9 @@ def setStamina(amount):
         if playerStamina >= maxPlayerStamina:
             playerStamina = maxPlayerStamina
 
+    if test == True:
+        print("Stamina is " + str(playerStamina))
+
 def increaseStamina(amount):
     global playerStamina, maxPlayerStamina
 
@@ -1326,6 +1362,9 @@ def increaseStamina(amount):
         if playerStamina >= maxPlayerStamina:
             playerStamina = maxPlayerStamina
 
+    if test == True:
+        print("Stamina is " + str(playerStamina))
+
 def reduceStamina(amount):
     global playerStamina
 
@@ -1336,6 +1375,9 @@ def reduceStamina(amount):
 
         if playerStamina <= 0:
             playerStamina = 0
+
+    if test == True:
+        print("Stamina is " + str(playerStamina))
 
 # health funcs
 def setHealth(amount):
@@ -1350,6 +1392,9 @@ def setHealth(amount):
         if playerHealth >= maxPlayerHealth:
             playerHealth = maxPlayerHealth
 
+    if test == True:
+        print("Health is " + str(playerHealth))
+
 def increaseHealth(amount):
     global playerHealth, maxPlayerHealth
 
@@ -1359,6 +1404,8 @@ def increaseHealth(amount):
         if playerHealth >= maxPlayerHealth:
             playerHealth = maxPlayerHealth
 
+    if test == True:
+        print("Health is " + str(playerHealth))
 
 def decreaseHealth(amount):
     global playerHealth
@@ -1369,10 +1416,16 @@ def decreaseHealth(amount):
         if playerHealth <= 0:
             playerHealth = 0
 
+    if test == True:
+        print("Health is " + str(playerHealth))
+
 ## direction/location stuff
 
 def getDirection():
     global direction
+
+    if test == True:
+        print("Direction is " + direction + "... Interpreting...")
 
     # i don't like this...
     if direction in command_dir_left:
@@ -1448,6 +1501,10 @@ def enemyStats(enemy):
 
 def enemyDamage(enemy):
     damage = random.randint(enemy['weapon'].get('healthtouse'), enemy['weapon'].get('staminatouse'))
+    
+    if test == True:
+        print("Enemy Damage is " + str(damage))
+    
     print("You take " + str(damage) + " damage!")
     decreaseHealth(damage)
 
@@ -1456,6 +1513,9 @@ def calcPlayerDamage(additionalmultiplier):
     global doesPlayerHaveGoldCoinPowers
     global lowStaminaDamageReductionMultiplier, emptyStaminaDamageReductionMultiplier
     global minStaminaToGetLowDamage
+
+    if test == True:
+        print("Calculating player damage...")
 
     damage = item_sword['healthtouse']
 
@@ -1467,12 +1527,18 @@ def calcPlayerDamage(additionalmultiplier):
     elif playerStamina <= 0:
         damage = damage * additionalmultiplier * emptyStaminaDamageReductionMultiplier
 
+    if test == True:
+        print("Player Damage is " + str(damage))
+
     return damage
 
 
 def playerDamage(enemy):
     global playerStamina
     global goldCoinStrengthMultiplier
+
+    if test == True:
+        print("Player gives damage.")
 
     # ONE LINE IF STATEMENTS AAAAA (https://www.pythoncentral.io/one-line-if-statement-in-python-ternary-conditional-operator/)
     # if we are able to give damage, do so.
@@ -1505,22 +1571,36 @@ def attackEnemy(clonecombatenemy, minimum, maximum, definiteAttack):
     ("\n" + clonecombatenemy['weapon'].get('desc') if clonecombatenemy['weapon'].get('desc') != "none" else "")
 
     if definiteAttack == False:
+        if test == True:
+            print("Attack is indefinite...")
         if (attackval > minimum) and (attackval < maximum):
+            if test == True:
+                print("Player attacks")
             print(attacksuccesstext)
             reduceStamina(staminaToReduceWhenAttacking)
             playerDamage(clonecombatenemy)
         elif attackval == maximum:
+            if test == True:
+                print("Enemy attacks")
             print(attackenemyattackstext)
             enemyDamage(clonecombatenemy)
         elif attackval == minimum:
+            if test == True:
+                print("Enemy dodges")
             print(attackenemydodgetext)
             reduceStamina(staminaToReduceWhenMissingAttack)
     elif definiteAttack == True:
+        if test == True:
+            print("Attack is definite...")
         if attackval > minimum:
+            if test == True:
+                print("Player attacks")
             print(attacksuccesstext)
             reduceStamina(staminaToReduceWhenAttacking)
             playerDamage(clonecombatenemy)
         elif attackval == minimum:
+            if test == True:
+                print("Enemy dodges")
             print(attackenemydodgetext)
             reduceStamina(staminaToReduceWhenMissingAttack)
 
@@ -1536,9 +1616,13 @@ def blockEnemy(clonecombatenemy, minimum, maximum):
     blockval = random.randint(minimum, maximum)
     
     if blockval > minimum:
+        if test == True:
+            print("Blocking enemy...")
         print(blocksuccesstext)
         return True
     elif blockval == minimum:
+        if test == True:
+            print("Enemy attacks while blocking...")
         print(blockenemyattacktext)
         enemyDamage(clonecombatenemy)
         return False
@@ -1558,10 +1642,14 @@ def dodgeEnemy(clonecombatenemy, minimum, maximum):
 
     # if we are able to dodge, do so.
     if dodgeval > minimum:
+        if test == True:
+            print("Dodging enemy...")
         print(successtext)
         reduceStamina(staminaToReduceWhenDodging)
         return True
     elif dodgeval == minimum:
+        if test == True:
+            print("Enemy attacks while dodging...")
         print(enemyattackstext)
         enemyDamage(clonecombatenemy)
         return False
@@ -1571,13 +1659,21 @@ def checkDefiniteAttack(enemy, hasDodged, hasBlocked):
 
     if enemy['health'] <= minToughEnemyHP:
         if hasDodged == True:
+            if test == True:
+                print("Definite attack...")
             return True
         elif hasDodged == False:
+            if test == True:
+                print("Indefinite attack...")
             return False
     elif enemy['health'] > minToughEnemyHP:
         if hasBlocked == True:
+            if test == True:
+                print("Definite attack...")
             return True
         elif hasBlocked == False:
+            if test == True:
+                print("Indefinite attack...")
             return False
 
 def combat(enemy, hasDodged, hasBlocked):
@@ -1715,6 +1811,8 @@ def firstEnemyEncounter(enemy):
 
             attackval = random.randint(minimum, maximum)
             if attackval == maximum:
+                if test == True:
+                    print("Enemy is angry...")
                 # enemy attacks!
                 print("\nYou try to run away from the " +
                       enemy['name'] + ", but they begin to attack!")
@@ -1725,6 +1823,9 @@ def firstEnemyEncounter(enemy):
                 gamestate = 2
             elif attackval < maximum:
                 # reduce stamina when we run
+                if test == True:
+                    print("We run away from the enemy.")
+                    
                 print("\nYou run away from the " +
                       enemy['name'] + ".\n")
                 reduceStamina(staminaToReduceWhileRunning)
@@ -1802,6 +1903,8 @@ def move():
             additionaltext = "on the " + direct
 
         if isGettingOutofDungeon == False:
+            if test == True:
+                print("Moving player...")
             print("\nYou go though the nearest hallway " + additionaltext + ".\n")
 
             reduceStamina(staminaToReduceWhileWalking)
@@ -1813,6 +1916,8 @@ def move():
             # random encounters! this is where we can spawn an enemy or item! We can also find random locations and rooms.
             encounter()
         elif isGettingOutofDungeon == True:
+            if test == True:
+                print("Player is trying to escape!")
             print("\nYou cannot get out of the dungeon...\n")
     elif direction not in commands:
         print("\nYou cannot go that way.\n")
@@ -1821,6 +1926,7 @@ def encounter():
     global doesPlayerHaveGoldCoinPowers
     global stepsToLair, maxStepsToLair
     global gamestate, currEnemy, attacking, dodging, blocking
+    global test
 
     if doesPlayerHaveGoldCoinPowers == False:
         # play the game as normal.
@@ -1831,6 +1937,8 @@ def encounter():
         else, just continue the game as normal.
         """
         if stepsToLair == maxStepsToLair:
+            if test == True:
+                print("Boss battle generated...")
             # begin boss battle.
             location = room_finalboss
             print("You arrive at " + location['name'] +
@@ -1847,20 +1955,35 @@ def encounter():
             # play the game as normal.
             encounterLogic()
 
+# check if the encounter is valid.
 def checkValidEncounter():
     global minStepsToDiscover
     global playerLocation
     
     if (playerLocation[0] >= minStepsToDiscover) or (playerLocation[0] <= -minStepsToDiscover) or (playerLocation[1] >= minStepsToDiscover) or (playerLocation[1] <= -minStepsToDiscover):
+        if test == True:
+            print("Encounter is valid.")
         return True
     
     return False
 
+# logic for spawning 2 enemies at once.
 def dualEnemies(enemy):
     global enemyMinRarity, enemyMaxRarity
-    
+    global minduel, maxduel
+    global test
+
+    if test == True:
+        print("2 enemies were generated...")
+        
     enemyrarity2 = random.randint(enemyMinRarity, enemyMaxRarity)
     enemy2 = random.choice(enemypool)
+
+    # bypass the rarity
+    if test == True:
+        testvar = random.randint(minduel, maxduel)
+        if testvar == maxduel:
+            enemy2['rarity'] = enemyrarity2
 
     if enemy2['rarity'] == enemyrarity2:
         enemyweapon2 = {
@@ -1880,8 +2003,14 @@ def dualEnemies(enemy):
             "maxhealth": int(enemy['maxhealth'] + enemy2['maxhealth']),
             'rarity': enemy['rarity']}
         
+        if test == True:
+            print("Successful generation...")
+
         return enemy22
     elif enemy2['rarity'] != enemyrarity2:
+        if test == True:
+            print("Unsuccessful generation...")
+
         return enemy
 
 def encounterLogic():
@@ -1895,6 +2024,10 @@ def encounterLogic():
     global itemMinRarity, itemMaxRarity
     global minduel, maxduel
     global gamestate, currEnemy, attacking, dodging, blocking
+    global test
+
+    if test == True:
+        print("Generating new encounter...")
 
     # don't discover anything if we are at initial spawn or we
     if playerLocation != [0,0] and checkValidEncounter():
@@ -1903,6 +2036,8 @@ def encounterLogic():
         location = random.choice(locationpool)
 
         if location['rarity'] == locationrarity:
+            if test == True:
+                print("New location generated...")
             print("You arrive at " + location['name'] +
                   ".\n" + location['desc'])
 
@@ -1911,13 +2046,19 @@ def encounterLogic():
         enemy = random.choice(enemypool)
 
         if enemy['rarity'] == enemyrarity:
+            if test == True:
+                print("New enemy generated...")
             duel = random.randint(minduel, maxduel)
 
             if duel == maxduel:
                enemy2 = dualEnemies(enemy)
+               if test == True:
+                    print("Enemy is a " + enemy2['name'].title())
                print("You encounter a " + enemy2['name'] + "!\n")
                currEnemy = enemy2
             elif duel != maxduel:
+               if test == True:
+                    print("Enemy is a " + enemy['name'].title())
                print("You encounter a " + enemy['name'] + "!\n")
                currEnemy = enemy
 
@@ -1936,6 +2077,9 @@ def encounterLogic():
                 "!\nYou don't need it right now, so you leave it aside.\n"
 
             if item['rarity'] == itemrarity:
+                if test == True:
+                    print("New item generated...")
+                
                 itemprefix = "" + "-" if item['istrap'] == True else "+" + ""
 
                 itemhealthstring = itemprefix + str(item['healthtouse']) + " Health"
@@ -1943,6 +2087,8 @@ def encounterLogic():
                 
                 # give ourselves the gold coin.
                 if item['isgold'] == True:
+                    if test == True:
+                        print("Item is gold")
                     if (playerGold < maxGoldCoinsToWin) and (doesPlayerHaveGoldCoinPowers == False):
                         print(itemstring + "\n+" + str(minGoldCoinsToGive) + " Gold Coins\n")
                         playerGold += minGoldCoinsToGive
@@ -1972,6 +2118,8 @@ Your maximum health is now """ + str(maxPlayerHealth) + """!
                 elif item['isgold'] == False:
                     # if this item isn't a trap, use it.
                     if item['istrap'] == False:
+                        if test == True:
+                            print("Item is not a trap")
                         # for items with both health and stamina, check those first
                         if item['healthtouse'] > 0 and item['staminatouse'] > 0:
                             if (playerHealth < maxPlayerHealth and playerStamina < maxPlayerStamina) or playerHealth < maxPlayerHealth or playerStamina < maxPlayerStamina:
@@ -1998,6 +2146,8 @@ Your maximum health is now """ + str(maxPlayerHealth) + """!
                                     print(itemleavestring)
                     # if the item is a trap, damage us
                     elif item['istrap'] == True:
+                        if test == True:
+                            print("Item is trap")
                         # for items with both health and stamina, check those first
                         if item['healthtouse'] > 0 and item['staminatouse'] > 0:
                             print(itemstring + "\n" + itemhealthstring + "\n" + itemstaminastring + "\n")
@@ -2019,6 +2169,9 @@ Your maximum health is now """ + str(maxPlayerHealth) + """!
 def gameStart():
     global gametitle, gameversion, gamecodename
     global gamestate
+
+    if test == True:
+        print("Generating intro screen...")
 
     # fancy title (https://www.tutorialspoint.com/python/python_strings.htm)
     fancytitle = ' '.join(gametitle).upper()
@@ -2064,6 +2217,9 @@ def namePlayer():
     # we need the player name for the intro sequence.
     playerName = getParserForGameState()
 
+    if test == True:
+        print("Player name is " + playerName)
+
     # check player name length.
     if len(playerName) >= minNameLength:
         gamestate = -1
@@ -2082,18 +2238,28 @@ def storyPrologue(isFixingMistake):
     global gamestate
     global starttext, proceedtext, gohometext
 
+    if test == True:
+        print("Showing story...")
+
     if isFixingMistake == False:
         # print the start text
         print(starttext)
+    elif isFixingMistake == True:
+        if test == True:
+            print("We are fixing a mistake...")
 
     # ask if the player wants to begin
     proceed = getParserForGameState()
     commands = getCommandsForGameState()
     if proceed in commands:
         if proceed in command_bootup_yes:
+            if test == True:
+                print("Begin game...")
             print(proceedtext)
             gamestate = 0
         elif proceed in command_bootup_no:
+            if test == True:
+                print("Leave game...")
             print(gohometext)
             stop()
     elif proceed not in commands:
@@ -2125,6 +2291,10 @@ def stop():
 ## GAME LOOP
 
 while playerHealth > 0:
+    if test == True:
+        print("Player is alive")
+        print("Gamestate is " + str(gamestate))
+
     # update text and objects
     updateText()
     updateObjects()
@@ -2154,13 +2324,17 @@ while playerHealth > 0:
         """
 if we have over 0 health, continue combat loop if the enemy is alive. also sisplay stats
 if we win the battle, regenerate some of the stamina and display win text.
-if we have 0 or loawer health, lock the health at 0, display stats, then display the death text.
+if we have 0 or lower health, lock the health at 0, display stats, then display the death text.
         """
         if currEnemy['health'] <= 0:
+            if test == True:
+                print("Player is no longer in combat. Enemy is dead.")
             currEnemy['health'] = 0
             # give us more stamina if we are under minimum stamina!
             # also, heal us if we are under the minimum health
             if currEnemy['name'] != npc_boss['name']:
+                if test == True:
+                    print("Enemy is not boss... Display normal text... Updating player stats...")
                 if playerStamina < minStaminaToGetLowDamage:
                     increaseStamina(bonusstamina)
                     print(wintext + breathtextalt)
@@ -2179,6 +2353,8 @@ if we have 0 or loawer health, lock the health at 0, display stats, then display
                 blocking = False
                 gamestate = 0
             elif currEnemy['name'] == npc_boss['name']:
+                if test == True:
+                    print("Enemy is boss... Display win text...")
                 # reset state and display ending
                 currEnemy = npc_null
                 attacking = False
@@ -2189,11 +2365,16 @@ if we have 0 or loawer health, lock the health at 0, display stats, then display
                 print(wintext_boss)
                 stop()
         elif currEnemy['health'] > 0:
+                if test == True:
+                    print("Player is in combat")
                 # continue combat loop
                 triggerCombat()
 
 # player death event        
 if playerHealth <= 0:
+    if test == True:
+        print("Player died")
+    
     if gamestate == 2:
         minr = minRevive
         maxr = maxRevive
