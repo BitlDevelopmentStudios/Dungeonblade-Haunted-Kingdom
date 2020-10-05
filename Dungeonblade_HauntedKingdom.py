@@ -613,7 +613,8 @@ def adjustDifficulty():
             minToughEnemyAttacksPlayer = 1
             maxToughEnemyAttacksPlayer = 3
             maxGoldCoinsToWin = 1
-            
+            # the amount of steps to discover our first discovery.
+            minStepsToDiscover = 3
         elif test == False:
             minduel = 1
             maxduel = 15
@@ -710,9 +711,7 @@ def adjustDifficulty():
         maxPlayerHealthAfterCoins  = 100
         # the health
         playerHealth = maxPlayerHealth
-
-        # the amount of steps to discover our first discovery.
-        minStepsToDiscover = 3
+        
         # the amount of stamina to reduce when walking
         staminaToReduceWhileWalking = 2
         # the amount of stamina to reduce when running
