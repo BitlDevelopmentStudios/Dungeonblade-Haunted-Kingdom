@@ -659,7 +659,7 @@ def adjustDifficulty():
         maxblock_toughenemy = 15
         # probability if we are going to be revived at 0 health.
         minRevive = 1
-        maxRevive = 2
+        maxRevive = 3
         # probability if we are going to be revived at 0 health for tougher enemies
         minRevive_toughenemy = 1
         maxRevive_toughenemy = 2
@@ -724,10 +724,10 @@ def adjustDifficulty():
         maxdodge_toughenemy = 4
         # probability if we are going to be revived at 0 health.
         minRevive = 1
-        maxRevive = 10
+        maxRevive = 7
         # probability if we are going to be revived at 0 health for tougher enemies
         minRevive_toughenemy = 1
-        maxRevive_toughenemy = 7
+        maxRevive_toughenemy = 5
         # the minimum amount of hp to consider us a tough enemy. the enemy's health must be over this. 
         minToughEnemyHP = 60
         # minimum health to consider us being at low health.
@@ -745,7 +745,7 @@ def adjustDifficulty():
         runStaminamax = 4
 
         print(hardtext)
-
+        
     # used for bonus stamina.
     bonusstamina = additionalStaminaToRegenAfterCombat + staminaToRegenAfterCombat
 
