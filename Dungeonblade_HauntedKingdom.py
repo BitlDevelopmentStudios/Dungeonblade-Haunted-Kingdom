@@ -26,7 +26,7 @@ sys.setrecursionlimit(10000000)
 On easy, you don't encounter 2 enemies at once that much.
 With this var, you can encounter them more. Only used for play testing.
 """
-test = True
+test = False
 
 # the game title
 gametitle = "Dungeonblade - Haunted Kingdom"
