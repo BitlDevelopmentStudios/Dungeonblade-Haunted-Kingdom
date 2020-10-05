@@ -1767,6 +1767,8 @@ def combat(enemy, hasDodged, hasBlocked):
     blocking = blocked
     gamestate = 2
 
+    print("DEBUG: Enemy: " + str(clonecombatenemy))
+
 ## navigation/exploration
     
 # when we first encounter an enemy
@@ -1922,6 +1924,9 @@ def move():
     elif direction not in commands:
         print("\nYou cannot go that way.\n")
 
+    if test == True:
+        print("DEBUG: Player Position: " + str(playerLocation))
+
 def encounter():
     global doesPlayerHaveGoldCoinPowers
     global stepsToLair, maxStepsToLair
@@ -1951,6 +1956,9 @@ def encounter():
             dodging = False
             blocking = False
             gamestate = 2
+            if test == True:
+                print("DEBUG: Location: " + str(location))
+                print("DEBUG: Location: " + str(enemy))
         elif stepsToLair != maxStepsToLair:
             # play the game as normal.
             encounterLogic()
@@ -2044,6 +2052,7 @@ def encounterLogic():
         if location['rarity'] == locationrarity:
             if test == True:
                 print("DEBUG: New location generated...")
+                print("DEBUG: Location: " + str(location))
             print("You arrive at " + location['name'] +
                   ".\n" + location['desc'])
 
@@ -2060,11 +2069,13 @@ def encounterLogic():
                enemy2 = dualEnemies(enemy)
                if test == True:
                     print("DEBUG: Enemy is a " + enemy2['name'].title())
+                    print("DEBUG: Enemy: " + str(enemy2))
                print("You encounter a " + enemy2['name'] + "!\n")
                currEnemy = enemy2
             elif duel != maxduel:
                if test == True:
                     print("DEBUG: Enemy is a " + enemy['name'].title())
+                    print("DEBUG: Enemy: " + str(enemy))
                print("You encounter a " + enemy['name'] + "!\n")
                currEnemy = enemy
 
@@ -2085,6 +2096,7 @@ def encounterLogic():
             if item['rarity'] == itemrarity:
                 if test == True:
                     print("DEBUG: New item generated...")
+                    print("DEBUG: Item: " + str(item))
                 
                 itemprefix = "" + "-" if item['istrap'] == True else "+" + ""
 
