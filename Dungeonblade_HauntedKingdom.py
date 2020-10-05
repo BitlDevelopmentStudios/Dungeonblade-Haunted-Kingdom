@@ -383,7 +383,9 @@ Enemies tremble in fear by your immense strength and luck.
 Your lungs are made of iron, and will take a very long time to run out of breath.
 Faeries will most likely come to you.
 You are nearly invulnerable.
-""" + ("""Test mode is enabled. This gives you even more power for the convienence of testing harder elements of """ + gametitle + ".\n" if test == True else "")
+""" + ("""
+NOTE: Test mode is enabled.
+This gives you even more power for the convienence of testing harder elements of """ + gametitle + ".\n" if test == True else "")
 
     normaltext = "\n" + command_difficulty_normal[0].title() + """:
 You begin with relatively high confidence.
