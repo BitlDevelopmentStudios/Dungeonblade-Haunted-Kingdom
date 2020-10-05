@@ -26,7 +26,7 @@ sys.setrecursionlimit(10000000)
 On easy, you don't encounter 2 enemies at once that much.
 With this var, you can encounter them more. Only used for play testing.
 """
-test = True
+test = False
 
 # the game title
 gametitle = "Dungeonblade - Haunted Kingdom"
@@ -422,8 +422,8 @@ The dungeon also inhabits faeries that have magical healing properties.
 
 As sworn Royal Guard for the King, you must protect the kingdom from these beasts by slaying them in this living dungeon.
 
-You have also heard of a mythic legend where """ + str(goldCoinsNeeded) + """ placed in special locations all over the dungeon.
-These coins give the possessor immense boosts of strength. They also will lead you to a 'mystic figure' that rules the dungeon.
+You have also heard of a mythic legend where """ + str(goldCoinsNeeded) + """ golden coin""" + ("s" if maxGoldCoinsToWin > 1 else "") + """ """ + ("were placed in special locations all over the dungeon." if maxGoldCoinsToWin > 1 else "was placed in a special location inside the dungeon.") + """
+""" + ("These coins give" if maxGoldCoinsToWin > 1 else "This coin gives") + """ the possessor immense boosts of strength. They also will lead you to a 'mystic figure' that rules the dungeon.
 Defeat the figure, and you will be able to escape from the dungeon.
 The legends also hinted at an 'apocalyptic event' that would happen afterward, but they weren't specific.
 
@@ -587,7 +587,20 @@ def adjustDifficulty():
         #easy
 
         # TEST MODE TOGGLED VALUES:
-        if test == False:
+        #Increase health more on test mode and increase probability of harder stuff.
+        if test == True:
+            minduel = 1
+            maxduel = 2
+            # probability for the enemy to attack the player before they start running.
+            minEnemyAttacksPlayer = 1
+            maxEnemyAttacksPlayer = 6
+            # probability for the tougher enemies to attack the player before they start running.
+            minToughEnemyAttacksPlayer = 1
+            maxToughEnemyAttacksPlayer = 3
+            # maximum health
+            maxPlayerHealth = 200
+            maxGoldCoinsToWin = 1
+        elif test == False:
             minduel = 1
             maxduel = 15
             # probability for the enemy to attack the player before they start running.
@@ -602,36 +615,19 @@ def adjustDifficulty():
             maxPlayerHealthAfterCoins  = 250
             # maximum stamina
             maxPlayerStamina = 150
-        #Increase health more on test mode and increase probability of harder stuff.
-        elif test == True:
-            minduel = 1
-            maxduel = 2
-            # probability for the enemy to attack the player before they start running.
-            minEnemyAttacksPlayer = 1
-            maxEnemyAttacksPlayer = 6
-            # probability for the tougher enemies to attack the player before they start running.
-            minToughEnemyAttacksPlayer = 1
-            maxToughEnemyAttacksPlayer = 3
-            # maximum health
-            maxPlayerHealth = 1000
-            # Maximum health after we get coins.
-            maxPlayerHealthAfterCoins  = 2000
-            # maximum stamina
-            maxPlayerStamina = 1000
+            # the amount of stamina to reduce when walking
+            staminaToReduceWhileWalking = 0.7
+            # the amount of stamina to reduce when running
+            staminaToReduceWhileRunning = 1.2
+            maxGoldCoinsToWin = 2
 
         # the health
         playerHealth = maxPlayerHealth
         # the stamina
         playerStamina = maxPlayerStamina
-        
-        # the amount of stamina to reduce when walking
-        staminaToReduceWhileWalking = 0.7
-        # the amount of stamina to reduce when running
-        staminaToReduceWhileRunning = 1.2
-
         # how many coins we need to win the game.
-        maxGoldCoinsToWin = 2
         goldCoinsNeeded = maxGoldCoinsToWin
+        
         # if we have <= 50 stamina, multiply the damage by this. 
         lowStaminaDamageReductionMultiplier = 0.8
         # if we have 0 stamina, multiply the damage by this.
