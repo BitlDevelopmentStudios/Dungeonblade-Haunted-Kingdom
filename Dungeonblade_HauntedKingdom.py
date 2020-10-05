@@ -1761,6 +1761,8 @@ def combat(enemy, hasDodged, hasBlocked):
                 print("\nYou must attack again, and then block!")
                 blocked = True
     elif choice not in commands:
+        if test == True:
+            print("DEBUG: Inavlid command...")
         print("\nYou cannot do that.")
 
     # attack is only initial
@@ -1867,6 +1869,8 @@ def firstEnemyEncounter(enemy):
                 gamestate = 0
                                 
     elif choice not in commands:
+        if test == True:
+            print("DEBUG: Invalid command...")
         print("\nYou cannot do that.\n")
 
 def move():
@@ -1925,6 +1929,8 @@ def move():
                 print("DEBUG: Player is trying to escape!")
             print("\nYou cannot get out of the dungeon...\n")
     elif direction not in commands:
+        if test == True:
+            print("DEBUG: Invalid command...")
         print("\nYou cannot go that way.\n")
 
     if test == True:
@@ -2227,6 +2233,8 @@ def difficultySelect():
                 print("\nThat isn't an option. Test mode is enabled, so some difficulty levels are disabled.\n")
                 gamestate = -3 
     elif difficulty not in commands:
+        if test == True:
+            print("DEBUG: Invalid command...")
         print("\nThat isn't an option.\n")
         gamestate = -3
 
@@ -2290,6 +2298,8 @@ def storyPrologue(isFixingMistake):
             print(gohometext)
             stop()
     elif proceed not in commands:
+        if test == True:
+            print("DEBUG: Invalid command...")
         print("\nThat isn't an option.\n")
         storyPrologue(True)
 
