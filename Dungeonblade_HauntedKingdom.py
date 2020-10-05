@@ -1409,7 +1409,7 @@ def decreaseHealth(amount):
     if playerHealth > 0:
         # decrease only half the health amount in test mode.
         if test == True:
-            playerHealth -= int(amount) * 0.5
+            playerHealth -= int(amount * 0.5)
         elif test == False:
             playerHealth -= int(amount)
 
@@ -1657,21 +1657,21 @@ def dodgeEnemy(clonecombatenemy, minimum, maximum):
 def checkDefiniteAttack(enemy, hasDodged, hasBlocked):
     global minToughEnemyHP
 
-    if enemy['health'] <= minToughEnemyHP:
-        if hasDodged == True:
-            if test == True:
-                print("DEBUG: Definite attack...")
-            return True
-        elif hasDodged == False:
-            if test == True:
-                print("DEBUG: Indefinite attack...")
-            return False
-    elif enemy['health'] > minToughEnemyHP:
+    if enemy['health'] > minToughEnemyHP:
         if hasBlocked == True:
             if test == True:
                 print("DEBUG: Definite attack...")
             return True
         elif hasBlocked == False:
+            if test == True:
+                print("DEBUG: Indefinite attack...")
+            return False
+    elif enemy['health'] <= minToughEnemyHP:
+        if hasDodged == True:
+            if test == True:
+                print("DEBUG: Definite attack...")
+            return True
+        elif hasDodged == False:
             if test == True:
                 print("DEBUG: Indefinite attack...")
             return False
@@ -1696,6 +1696,10 @@ def combat(enemy, hasDodged, hasBlocked):
 
     # same thing here but it's for blocking.
     blocked = hasBlocked
+
+    if test == True:
+        print("DEBUG: Has Dodged: " + str(hasDodged))
+        print("DEBUG: Has Blocked: " + str(hasBlocked))
 
     # set up a fake clone enemy with enemy combat stats
     clonecombatenemy = {
