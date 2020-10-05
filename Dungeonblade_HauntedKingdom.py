@@ -767,7 +767,7 @@ def adjustDifficulty():
     if test == True:
         print("DEBUG: Difficulty " + difficulty + "... initalized.")
 
-#get the main difficulty name.
+#get the main difficulty command name.
 def getDifficulty():
     global difficulty
     global command_difficulty_easy, command_difficulty_normal, command_difficulty_hard
@@ -1335,6 +1335,8 @@ You ready your """ + item_sword['name'].replace("their ", "") + ".",
 ## stat level manipuation
 
 # stamina funcs
+
+# set the stamina
 def setStamina(amount):
     global playerStamina, maxPlayerStamina
 
@@ -1352,6 +1354,7 @@ def setStamina(amount):
     if test == True:
         print("DEBUG: Stamina is " + str(playerStamina))
 
+# increase the stamina
 def increaseStamina(amount):
     global playerStamina, maxPlayerStamina
 
@@ -1366,6 +1369,7 @@ def increaseStamina(amount):
     if test == True:
         print("DEBUG: Stamina is " + str(playerStamina))
 
+# reduce the stamina
 def reduceStamina(amount):
     global playerStamina
 
@@ -1381,6 +1385,8 @@ def reduceStamina(amount):
         print("DEBUG: Stamina is " + str(playerStamina))
 
 # health funcs
+
+# set the health
 def setHealth(amount):
     global playerHealth, maxPlayerHealth
 
@@ -1396,6 +1402,7 @@ def setHealth(amount):
     if test == True:
         print("DEBUG: Health is " + str(playerHealth))
 
+# increase the health
 def increaseHealth(amount):
     global playerHealth, maxPlayerHealth
 
@@ -1408,6 +1415,7 @@ def increaseHealth(amount):
     if test == True:
         print("DEBUG: Health is " + str(playerHealth))
 
+# sdecrease the health
 def decreaseHealth(amount):
     global playerHealth
 
@@ -1504,6 +1512,7 @@ def enemyStats(enemy):
 
 ## combat
 
+# the enemy deals damage
 def enemyDamage(enemy):
     damage = random.randint(enemy['weapon'].get('healthtouse'), enemy['weapon'].get('staminatouse'))
     
@@ -1513,7 +1522,7 @@ def enemyDamage(enemy):
     print("You take " + str(damage) + " damage!")
     decreaseHealth(damage)
 
-
+# calculate the player's damage amount.
 def calcPlayerDamage(additionalmultiplier):
     global doesPlayerHaveGoldCoinPowers
     global lowStaminaDamageReductionMultiplier, emptyStaminaDamageReductionMultiplier
@@ -1524,6 +1533,7 @@ def calcPlayerDamage(additionalmultiplier):
 
     damage = item_sword['healthtouse']
 
+    # Change damage depending on how much stamina we have or how many coins we have.
     if playerStamina > 0:
         if playerStamina <= minStaminaToGetLowDamage:
             damage = damage * additionalmultiplier * lowStaminaDamageReductionMultiplier
@@ -1537,7 +1547,7 @@ def calcPlayerDamage(additionalmultiplier):
 
     return damage
 
-
+# the player deals damage
 def playerDamage(enemy):
     global playerStamina
     global goldCoinStrengthMultiplier
@@ -1559,7 +1569,7 @@ def playerDamage(enemy):
 
     enemy['health'] -= damage
 
-
+# the player's attack
 def attackEnemy(clonecombatenemy, minimum, maximum, definiteAttack):
     global staminaToReduceWhenAttacking, staminaToReduceWhenMissingAttack
 
@@ -1575,6 +1585,11 @@ def attackEnemy(clonecombatenemy, minimum, maximum, definiteAttack):
     ", but the " + clonecombatenemy['name'] + " attacks you first with " + clonecombatenemy['weapon'].get('name') + "!" + \
     ("\n" + clonecombatenemy['weapon'].get('desc') if clonecombatenemy['weapon'].get('desc') != "none" else "")
 
+    """
+    definite attacks are attacks where the enemy has a lower chance of attacking you back.
+    mainly: dodge + attack for lower ranking enemies, and block + attack for higher ranking enemies.
+    """
+    
     if definiteAttack == False:
         if test == True:
             print("DEBUG: Attack is indefinite...")
@@ -1609,6 +1624,7 @@ def attackEnemy(clonecombatenemy, minimum, maximum, definiteAttack):
             print(attackenemydodgetext)
             reduceStamina(staminaToReduceWhenMissingAttack)
 
+# the player's shield block
 def blockEnemy(clonecombatenemy, minimum, maximum):
     # if we are able to block, do so.
 
@@ -1632,7 +1648,7 @@ def blockEnemy(clonecombatenemy, minimum, maximum):
         enemyDamage(clonecombatenemy)
         return False
 
-
+# the player's dodge
 def dodgeEnemy(clonecombatenemy, minimum, maximum):
     global staminaToReduceWhenDodging
 
@@ -1659,6 +1675,7 @@ def dodgeEnemy(clonecombatenemy, minimum, maximum):
         enemyDamage(clonecombatenemy)
         return False
 
+# check if we are able to get a definite attack.
 def checkDefiniteAttack(enemy, hasDodged, hasBlocked):
     global minToughEnemyHP
 
@@ -1681,6 +1698,7 @@ def checkDefiniteAttack(enemy, hasDodged, hasBlocked):
                 print("DEBUG: Enemy: Indefinite attack...")
             return False
 
+# Combat
 def combat(enemy, hasDodged, hasBlocked):
     global playerName
     global playerStamina
@@ -1879,6 +1897,7 @@ def firstEnemyEncounter(enemy):
             print("DEBUG: Invalid command...")
         print("\nYou cannot do that.\n")
 
+# move the player around
 def move():
     global doesPlayerHaveGoldCoinPowers
     global direction
@@ -1942,6 +1961,7 @@ def move():
     if test == True:
         print("DEBUG: Player Position: " + str(playerLocation))
 
+# random encounters
 def encounter():
     global doesPlayerHaveGoldCoinPowers
     global stepsToLair, maxStepsToLair
@@ -2004,7 +2024,7 @@ def dualEnemies(enemy):
     enemyrarity2 = random.randint(enemyMinRarity, enemyMaxRarity)
     enemy2 = random.choice(enemypool)
 
-    # bypass the rarity
+    # bypass the rarity if we are in test mode
     if test == True:
         print("DEBUG: Using test mode bypass for 2 enemies...")
         testvar = random.randint(minduel, maxduel)
@@ -2058,7 +2078,7 @@ def encounterLogic():
     if test == True:
         print("DEBUG: Generating new encounter...")
 
-    # don't discover anything if we are at initial spawn or we
+    # don't discover anything if we are at initial spawn or if the encounter isn't valid.
     if playerLocation != [0,0] and checkValidEncounter():
         # grab a random location?
         locationrarity = random.randint(locationMinRarity, locationMaxRarity)
@@ -2431,14 +2451,14 @@ if playerHealth <= 0:
         reviveval = random.randint(minr, maxr)
         if reviveval == maxRevive:
             if test == True:
-                print("DEBUG: Player revived")
+                print("DEBUG: Combat: Player revived")
             print(combatrevivetext)
             setHealth(maxPlayerHealth)
             setStamina(maxPlayerStamina)
             triggerCombat()
         elif reviveval != maxRevive:
             if test == True:
-                print("DEBUG: Player dead")
+                print("DEBUG: Combat: Player dead")
             enemyStats(currEnemy)
             playerStats()
             print(deadtext)
@@ -2448,7 +2468,7 @@ if playerHealth <= 0:
         reviveval = random.randint(minRevive, maxRevive)
         if reviveval == maxRevive:
             if test == True:
-                print("DEBUG: Player revived")
+                print("DEBUG: Idle: Player revived")
             print(revivetext)
             setHealth(maxPlayerHealth)
             setStamina(maxPlayerStamina)
@@ -2456,7 +2476,7 @@ if playerHealth <= 0:
             move()
         elif reviveval != maxRevive:
             if test == True:
-                print("DEBUG: Player dead")
+                print("DEBUG: Idle: Player dead")
             playerStats()
             print(deadtextdungeon)
             stop()
