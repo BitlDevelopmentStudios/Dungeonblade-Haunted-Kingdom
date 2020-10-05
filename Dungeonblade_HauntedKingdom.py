@@ -1796,7 +1796,8 @@ def combat(enemy, hasDodged, hasBlocked):
     blocking = blocked
     gamestate = 2
 
-    print("DEBUG: Enemy: " + str(clonecombatenemy))
+    if test == True:
+        print("DEBUG: Enemy: " + str(clonecombatenemy))
 
 ## navigation/exploration
     
