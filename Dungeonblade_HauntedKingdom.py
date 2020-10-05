@@ -1964,8 +1964,10 @@ def checkValidEncounter():
         if test == True:
             print("Encounter is valid.")
         return True
-    
-    return False
+    else:
+        if test == True:
+            print("Encounter is invalid.")
+        return False
 
 # logic for spawning 2 enemies at once.
 def dualEnemies(enemy):
