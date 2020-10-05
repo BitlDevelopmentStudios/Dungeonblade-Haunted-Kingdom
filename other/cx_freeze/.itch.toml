@@ -1,0 +1,5 @@
+[[actions]]
+name = "Play"
+path = "Dungeonblade_HauntedKingdom.exe"
+console = true
+sandbox = true

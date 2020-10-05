@@ -5,7 +5,7 @@ from cx_Freeze import setup, Executable
 build_exe_options = {"packages": ["os"], "excludes": ["tkinter"]}
 
 target = Executable(
-    script="Dungeonblade_HauntedKingdom.py",
+    script="../../Dungeonblade_HauntedKingdom.py",
     base=None,
     icon="icon.ico")
 
