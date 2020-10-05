@@ -917,7 +917,7 @@ there's also a description for each enemy weapon to describe the enemy's actions
 
     item_bite = {
         'name': "their bite",
-        'desc': "The enemy inflicts a bite on you!",
+        'desc': "The enemy bites you!",
         'healthtouse': 8,
         'staminatouse': 10,
         "rarity": 0,
@@ -935,7 +935,7 @@ there's also a description for each enemy weapon to describe the enemy's actions
 
     item_highrankbite = {
         'name': item_bite['name'],
-        'desc': "The enemy inflicts a poisonous bite on you!",
+        'desc': item_bite['desc'] + " It was poisonous!",
         'healthtouse': 25,
         'staminatouse': 30,
         "rarity": item_bite['rarity'],
@@ -1256,7 +1256,8 @@ format: location name, location description, and location rarity (1-5).
     # Throne Room
     room_throneroom = {
         'name': 'a degraded throne room',
-        'desc': """You see a large expance. In front of you, you see a large throne with 2 portraits.
+        'desc': """You see a large expance.
+In front of you, you see a large throne with 2 portraits.
 On the floor you see shattered vaces, rotten flowers, and articles of clothing. Some poor soul had to live in this place...
 """,
         'rarity': 5}
@@ -1264,7 +1265,8 @@ On the floor you see shattered vaces, rotten flowers, and articles of clothing. 
     # Dining Room
     room_diningroom = {
         'name': 'a degraded dining room',
-        'desc': """You see a large wooden table, with dishes left on it. On the floor, you see more plates, most of them shattered.
+        'desc': """You see a large wooden table, with dishes left on it.
+On the floor, you see more plates, most of them shattered.
 You can see lavish decorations all over the room. Flies buzz all around the room. Who would eat here anymore?
 """,
         'rarity': 4}
@@ -1272,7 +1274,8 @@ You can see lavish decorations all over the room. Flies buzz all around the room
     # Armory
     room_armory = {
         'name': 'a large armory',
-        'desc': """In front of you, you see several suits of armor. Some of these suits of armor have broken apart over time.
+        'desc': """In front of you, you see several suits of armor.
+Some of these suits of armor have broken apart over time.
 You also see large shields between each suit, depicting a yellow lion over a red background. 
 """,
         'rarity': 4}
@@ -1280,7 +1283,8 @@ You also see large shields between each suit, depicting a yellow lion over a red
     #A room with a lot of plants.
     room_overgrowth = {
         'name': 'a room covered in a massive overgrowth',
-        'desc': """All over you, you see large plants growing from the cracks in the walls. You see vines hanging from the ceiling.
+        'desc': """All over you, you see large plants growing from the cracks in the walls.
+You see vines hanging from the ceiling.
 This room has not been maintained for years...
 """,
         'rarity': 2}
@@ -1295,7 +1299,8 @@ This room has not been maintained for years...
     #ruins
     room_ruins = {
         'name': 'a pile of ruins',
-        'desc': """You see remmnants of a massive building from centuries' past. Large pieces of stone litter the ground.
+        'desc': """You see remmnants of a massive building from centuries' past.
+Large pieces of stone litter the ground.
 These ruins seem to come from a temple of a religious purpose...
 """,
         'rarity': 3}
@@ -1304,7 +1309,8 @@ These ruins seem to come from a temple of a religious purpose...
     room_bones = {
         'name': 'a room filled with bones',
         'desc': """Around you, you see thousands upon thousands of bones.
-Many of them seem to be from fallen explorers who have dared to explore this place...
+Many of them seem to be from fallen explorers who have dared to explore this place.
+You hear the haunting voices of many of these unfortunate explorers, which sends a shiver down your spine...
 """,
         'rarity': 4}
 
