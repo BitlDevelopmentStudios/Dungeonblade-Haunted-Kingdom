@@ -1983,9 +1983,13 @@ def dualEnemies(enemy):
 
     # bypass the rarity
     if test == True:
+        print("Using test mode bypass for 2 enemies...")
         testvar = random.randint(minduel, maxduel)
         if testvar == maxduel:
+            print("Bypass successful...")
             enemy2['rarity'] = enemyrarity2
+        elif testvar != maxduel:
+            print("Bypass unsuccessful...")
 
     if enemy2['rarity'] == enemyrarity2:
         enemyweapon2 = {
