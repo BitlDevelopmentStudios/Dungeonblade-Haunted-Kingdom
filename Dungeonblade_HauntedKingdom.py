@@ -1962,11 +1962,11 @@ def checkValidEncounter():
     
     if (playerLocation[0] >= minStepsToDiscover) or (playerLocation[0] <= -minStepsToDiscover) or (playerLocation[1] >= minStepsToDiscover) or (playerLocation[1] <= -minStepsToDiscover):
         if test == True:
-            print("DEBUG: Encounter is valid.")
+            print("DEBUG: Planned encounter is valid.\nDEBUG: We can spawn an enemy, item or location now.")
         return True
     else:
         if test == True:
-            print("DEBUG: Encounter is invalid.")
+            print("DEBUG: Planned encounter is invalid.\nDEBUG: We cannot spawn an enemy, item or location at this moment.")
         return False
 
 # logic for spawning 2 enemies at once.
@@ -2169,9 +2169,6 @@ Your maximum health is now """ + str(maxPlayerHealth) + """!
                             if item['staminatouse'] > 0:
                                 print(itemstring + "\n" + itemstaminastring + "\n")
                                 reduceStamina(item['staminatouse'])
-    else:
-        if test == True:
-            print("DEBUG: Empty encounter...")
 
 ## game logic
 
@@ -2231,11 +2228,17 @@ def namePlayer():
 
     # check player name length.
     if len(playerName) >= minNameLength:
+        if test == True:
+            print("DEBUG: Valid name...")
         gamestate = -1
     elif len(playerName) < minNameLength and len(playerName) > 0:
+        if test == True:
+            print("DEBUG: Short name...")
         print("\nYour name is too short. Try again.\n")
         gamestate = -2
     elif len(playerName) <= 0:
+        if test == True:
+            print("DEBUG: No name...")
         print("\nYou must provide a name to continue. Try again.\n")
         gamestate = -2
 
@@ -2343,7 +2346,7 @@ if we have 0 or lower health, lock the health at 0, display stats, then display 
             # also, heal us if we are under the minimum health
             if currEnemy['name'] != npc_boss['name']:
                 if test == True:
-                    print("DEBUG: Enemy is not boss...\nDisplay normal text...\nUpdating player stats...")
+                    print("DEBUG: Enemy is not boss...\nDEBUG: Display normal text...\nDEBUG: Updating player stats...")
                 if playerStamina < minStaminaToGetLowDamage:
                     increaseStamina(bonusstamina)
                     print(wintext + breathtextalt)
@@ -2363,7 +2366,7 @@ if we have 0 or lower health, lock the health at 0, display stats, then display 
                 gamestate = 0
             elif currEnemy['name'] == npc_boss['name']:
                 if test == True:
-                    print("DEBUG: Enemy is boss...\nDisplay win text...")
+                    print("DEBUG: Enemy is boss...\nDEBUG: Display win text...")
                 # reset state and display ending
                 currEnemy = npc_null
                 attacking = False
