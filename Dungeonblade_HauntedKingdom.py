@@ -22,10 +22,16 @@ sys.setrecursionlimit(10000000)
 
 ## game info
 
+"""
+On easy, you don't encounter 2 enemies at once that much.
+With this var, you can encounter them more. Only used for play testing.
+"""
+test = False
+
 # the game title
 gametitle = "Dungeonblade - Haunted Kingdom"
 # the game version
-gameversion = "v1.0"
+gameversion = "v1.0" + (" (Playtest Mode)" if test == True else "")
 # the game codename
 gamecodename = "StarDancer"
 
@@ -288,6 +294,7 @@ def updateText():
     global goldCoinsNeeded
     global command_difficulty_easy, command_difficulty_normal, command_difficulty_hard
     global enemyattacktext
+    global test, gametitle
     
     wintextbase = "The " + currEnemy['name'] + " has been slayed!"
     
@@ -376,7 +383,7 @@ Enemies tremble in fear by your immense strength and luck.
 Your lungs are made of iron, and will take a very long time to run out of breath.
 Faeries will most likely come to you.
 You are nearly invulnerable.
-"""
+""" + ("""Test mode is enabled. This gives you even more power for the convienence of testing harder elements of """ + gametitle + ".\n" if test == True else "")
 
     normaltext = "\n" + command_difficulty_normal[0].title() + """:
 You begin with relatively high confidence.
@@ -473,15 +480,20 @@ def getParserForGameState():
     global command_dir_right, command_dir_left, command_dir_forward, command_dir_backward
     global command_encounter_fight, command_encounter_run
     global command_combat_attack, command_combat_dodge, command_combat_block
+    global test
 
     parser = ""
     
     #-3: difficulty select
     if gamestate == -3:
-        parser = input("Type " +
-                       outputCommandListForCommand(command_difficulty_easy, False) + " for the " + command_difficulty_easy[0].title() + " difficulty,\n" +
-                       outputCommandListForCommand(command_difficulty_normal, False) + " for the " + command_difficulty_normal[0].title() + " difficulty, or\n" +
-                       outputCommandListForCommand(command_difficulty_hard, False) + " for the " + command_difficulty_hard[0].title() + " difficulty: ")
+        if test == False:
+            parser = input("Type " +
+                           outputCommandListForCommand(command_difficulty_easy, False) + " for the " + command_difficulty_easy[0].title() + " difficulty,\n" +
+                           outputCommandListForCommand(command_difficulty_normal, False) + " for the " + command_difficulty_normal[0].title() + " difficulty, or\n" +
+                           outputCommandListForCommand(command_difficulty_hard, False) + " for the " + command_difficulty_hard[0].title() + " difficulty: ")
+        elif test == True:
+            parser = input("Type " +
+                           outputCommandListForCommand(command_difficulty_easy, False) + " for the " + command_difficulty_easy[0].title() + " difficulty. Test mode is enabled: ")
     #-2: name change
     elif gamestate == -2:
         parser = input("Please enter your name to proceed: ")
@@ -567,15 +579,32 @@ def adjustDifficulty():
     global runStaminamax
     global minattack_afterblock_toughenemy, maxattack_afterblock_toughenemy
     global easytext, normaltext, hardtext
+    global test
     
     if difficulty in command_difficulty_easy:
         #easy
-        # maximum health
-        maxPlayerHealth = 150
-        # Maximum health after we get coins.
-        maxPlayerHealthAfterCoins  = 250
-        # maximum stamina
-        maxPlayerStamina = 150
+
+        # TEST MODE TOGGLED VALUES:
+        if test == False:
+            minduel = 1
+            maxduel = 15
+            # maximum health
+            maxPlayerHealth = 150
+            # Maximum health after we get coins.
+            maxPlayerHealthAfterCoins  = 250
+            # maximum stamina
+            maxPlayerStamina = 150
+        #Increase health more on test mode and increase probability of 2 enemies at once.
+        elif test == True:
+            minduel = 1
+            maxduel = 5
+            # maximum health
+            maxPlayerHealth = 200
+            # Maximum health after we get coins.
+            maxPlayerHealthAfterCoins  = 300
+            # maximum stamina
+            maxPlayerStamina = 200
+
         # the health
         playerHealth = maxPlayerHealth
         # the stamina
@@ -595,9 +624,7 @@ def adjustDifficulty():
         emptyStaminaDamageReductionMultiplier = 0.6
         
         ## combat vars
-
-        minduel = 1
-        maxduel = 15
+            
         # dodge probability
         mindodge = 1
         maxdodge = 15
@@ -2009,9 +2036,18 @@ def difficultySelect():
     commands = getCommandsForGameState()
 
     if difficulty in commands:
-        print("\nThe difficulty has been set to " + getDifficulty().title() + ".")
-        adjustDifficulty()
-        gamestate = -2
+        if test == False:
+            print("\nThe difficulty has been set to " + getDifficulty().title() + ".")
+            adjustDifficulty()
+            gamestate = -2
+        elif test == True:
+            if difficulty in command_difficulty_easy:
+                print("\nThe difficulty has been set to " + getDifficulty().title() + ".")
+                adjustDifficulty()
+                gamestate = -2
+            else:
+                print("\nThat isn't an option. Test mode is enabled, so some difficulty levels are disabled.\n")
+                gamestate = -3 
     elif difficulty not in commands:
         print("\nThat isn't an option.\n")
         gamestate = -3
