@@ -605,7 +605,7 @@ def adjustDifficulty():
         #Increase health more on test mode and increase probability of harder stuff.
         if test == True:
             minduel = 1
-            maxduel = 2
+            maxduel = 3
             # probability for the enemy to attack the player before they start running.
             minEnemyAttacksPlayer = 1
             maxEnemyAttacksPlayer = 3
