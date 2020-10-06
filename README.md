@@ -52,7 +52,7 @@ Compiled releases on the itch.io page: https://bitl.itch.io/dungeonblade-hk
 
 Report bugs here: https://github.com/BitlDevelopmentStudios/Dungeonblade-Haunted-Kingdom/issues
 
-Pre-Release builds here: https://github.com/BitlDevelopmentStudios/Dungeonblade-Haunted-Kingdom/releases
+Pre-Release builds are accessible through the itch.io app. Multiple versions are available by installing the "Pre-Release" build. After that right click, select "Manage", select the pre-release build, then click on "Switch to previous version". 
 
 # Source Licence info:
 ![LGPL Logo](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)
