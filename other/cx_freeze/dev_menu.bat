@@ -67,14 +67,16 @@ IF %checkoption%==1 GOTO RELEASE_DRY
 
 :RELEASE
 CLS
-butler push Novetus bitl/dungeonblade-hk:windows --if-changed --userversion-file releaseversion.txt
+butler push build/exe.win32-3.7 bitl/dungeonblade-hk:windows --if-changed --userversion-file releaseversion.txt
 pause
+rmdir /Q /S build
 GOTO MENU
 
 :RELEASE_DRY
 CLS
 butler push build/exe.win32-3.7 bitl/dungeonblade-hk:windows --if-changed --dry-run --userversion-file releaseversion.txt
 pause
+rmdir /Q /S build
 GOTO MENU
 
 :VALIDATE
